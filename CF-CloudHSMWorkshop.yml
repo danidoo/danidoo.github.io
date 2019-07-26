@@ -1,0 +1,278 @@
+Description:  This template deploys a VPC, with two public subnets, two private subnets, and six protected subnets
+  across several Availability Zones. With A VPC Enpoint for Session Manager
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+#    DeletionPolicy: Retain
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+      - Key: Name
+        Value: cloudhsm-vpc
+
+  ProtectedSubnet1a :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      Tags:
+        - Key: Name
+          Value: ProtectedSubnet1a
+
+  ProtectedSubnet1b :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      Tags:
+        - Key: Name
+          Value: ProtectedSubnet1b
+
+  ProtectedSubnet1c :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1c
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      Tags:
+        - Key: Name
+          Value: ProtectedSubnet1c
+
+  ProtectedSubnet1d :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1d
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.3.0/24
+      Tags:
+        - Key: Name
+          Value: ProtectedSubnet1d
+
+  ProtectedSubnet1e :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1e
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.4.0/24
+      Tags:
+        - Key: Name
+          Value: ProtectedSubnet1e
+
+  ProtectedSubnet1f :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1f
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.5.0/24
+      Tags:
+        - Key: Name
+          Value: ProtectedSubnet1f
+
+  PrivateSubnet1a :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.128.0/24
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet1a
+
+  PrivateSubnet1b :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.129.0/24
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet1b
+
+  secGroupName:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: vpc-endpoints
+      GroupDescription: For communication with VPC Endpoints
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: secGroupName_VPC_Endpoints
+
+  VPCEndointServicesEc2:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      SecurityGroupIds: 
+        - !Ref secGroupName
+      ServiceName: !Join [ ".",["com.amazonaws",!Ref "AWS::Region","ec2"]]
+      SubnetIds: 
+        - !Ref PrivateSubnet1a
+        - !Ref PrivateSubnet1b
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+
+  VPCEndointServicesSSM:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      SecurityGroupIds: 
+        - !Ref secGroupName
+      ServiceName: !Join [ ".", ["com.amazonaws",!Ref "AWS::Region", "ssm"]]
+      SubnetIds: 
+        - !Ref PrivateSubnet1a
+        - !Ref PrivateSubnet1b
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+
+  VPCEndointServicesec2messages:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      SecurityGroupIds: 
+        - !Ref secGroupName
+      ServiceName: !Join [ ".", ["com.amazonaws",!Ref "AWS::Region", "ec2messages"]]
+      SubnetIds: 
+        - !Ref PrivateSubnet1a
+        - !Ref PrivateSubnet1b
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+
+  VPCEndointServicesSSMmessages:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      SecurityGroupIds: 
+        - !Ref secGroupName
+      ServiceName: !Join [ ".", ["com.amazonaws",!Ref "AWS::Region", "ssmmessages"] ]
+      SubnetIds: 
+        - !Ref PrivateSubnet1a
+        - !Ref PrivateSubnet1b
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+
+  PublicSubnet1a :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.192.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet1a
+
+  PublicSubnet1b :
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1b
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.193.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet1b
+
+  IGWCloudHSMWorkshop:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: IGWCloudHSMWorkshop
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref IGWCloudHSMWorkshop
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:  
+        Ref: VPC
+      Tags:
+      - Key: Name
+        Value: PublicRouteTable
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+       RouteTableId:
+         Ref: PublicRouteTable
+       DestinationCidrBlock: 0.0.0.0/0
+       GatewayId:
+         Ref: IGWCloudHSMWorkshop
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:  
+        Ref: VPC
+      Tags:
+      - Key: Name
+        Value: PrivateRouteTable
+
+  NAT:
+    Type: AWS::EC2::NatGateway
+    Properties:
+        AllocationId:
+          Fn::GetAtt:
+          - EIP
+          - AllocationId
+        SubnetId:
+          Ref: PublicSubnet1a
+        Tags:
+        - Key: Name
+          Value: NATGatewayCloudHSMWorkshop
+  EIP:
+    DependsOn: AttachGateway
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  Route:
+   Type: AWS::EC2::Route
+   Properties:
+      RouteTableId:
+         Ref: PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+         Ref: NAT
+
+  SubnetRouteTableAssociationPublicSubnet1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet1a
+      RouteTableId:
+        Ref: PublicRouteTable
+  
+  SubnetRouteTableAssociationPublicSubnet1b:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet1b
+      RouteTableId:
+        Ref: PublicRouteTable
+
+  SubnetRouteTableAssociationPrivateSubnet1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet1a
+      RouteTableId:
+        Ref: PrivateRouteTable
+
+  SubnetRouteTableAssociationPrivateSubnet1b:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet1b
+      RouteTableId:
+        Ref: PrivateRouteTable
+
