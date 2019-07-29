@@ -122,7 +122,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 </details></li>
 </ul>
 <h3 id="2-cree-un-cluster">2. Cree un cluster</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -133,7 +133,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 </details></li>
 </ul>
 <h3 id="3-cree-un-bucket-s3-para-almacenamiento-de-objetos">3. Cree un bucket S3 para almacenamiento de objetos</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -145,7 +145,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 </details></li>
 </ul>
 <h3 id="4-cree-una-politica-iam-de-acceso-al-bucket-s3-creado-anteriormente">4. Cree una politica IAM de acceso al bucket S3 creado anteriormente</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -163,7 +163,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 </details></li>
 </ul>
 <h3 id="5-cree-un-role-iam-para-instancias-ec2-gestionadas-por-el-ssm-systems-manager">5. Cree un role IAM para instancias EC2 gestionadas por el SSM Systems Manager</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -178,7 +178,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 </details></li>
 </ul>
 <h3 id="6-cree-un-cloudhsm-en-el-cluster">6. Cree un CloudHSM en el cluster</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -189,7 +189,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 </details></li>
 </ul>
 <h3 id="7-cree-una-instancia-ec2-para-gestion-del-cloudhsm">7. Cree una instancia EC2 para gestión del CloudHSM</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -213,7 +213,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 </details></li>
 </ul>
 <h3 id="8-descargue-el-csr-y-lo-deje-disponible-para-firmar-en-el-bucket-s3">8. Descargue el CSR y lo deje disponible para firmar en el bucket S3</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -227,7 +227,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 </details></li>
 </ul>
 <h3 id="9-use-la-instancia-de-gestion-para-firmar-el-csr">9. Use la instancia de gestión para firmar el CSR</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -289,7 +289,7 @@ aws configure<br></p>
 </details></li>
 </ul>
 <h3 id="10-use-el-cliente-de-cloudhsm-para-conectar-al-cluster">10. Use el cliente de CloudHSM para conectar al cluster</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
@@ -323,7 +323,7 @@ ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util<br></p>
 </li>
 </ul>
 <h3 id="11-configure-las-reglas-de-firewall-para-conectar-al-cloudhsm">11. Configure las reglas de firewall para conectar al CloudHSM</h3>
-<p><details closed>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
