@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Inicialización del cluster - CloudHSM Workshop</title>
+        <title>Inicialización - CloudHSM Workshop</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -53,13 +53,16 @@
                                 <a href="../networking_setup/">Ambiente de redes</a>
                             </li>
                             <li class="active">
-                                <a href="./">Inicialización del cluster</a>
+                                <a href="./">Inicialización</a>
                             </li>
                             <li >
                                 <a href="../key_management/">Gestión de llaves</a>
                             </li>
                             <li >
                                 <a href="../website/">Website</a>
+                            </li>
+                            <li >
+                                <a href="../acm/">ACM</a>
                             </li>
                         </ul>
 
@@ -108,7 +111,8 @@
 <h3 id="1-cree-una-vpc">1. Cree una VPC</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
-<br /></p>
+<br />
+Si la infraestructura básica fue creada en el modulo anterior, podrás saltar este paso.</p>
 <ul>
 <li><strong>1.1.</strong> En un navegador, abra el sitio <CFN_Github></li>
 <li><strong>1.2.</strong> Haga click en <strong>Raw</strong> e descargue el archivo a su maquina con el nombre cloudhsm-landing-zone.json.</li>
@@ -262,26 +266,26 @@ aws configure<br></p>
 </li>
 <li>
 <p><strong>9.13.</strong> Firme el CSR con el comando:</p>
-<p>openssl x509 -req -days 3652 -in cluster-&lt;id_del_cluster&gt;_ClusterCsr.csr \
--CA customerCA.crt \
--CAkey customerCA.key \
--CAcreateserial \
--out CustomerHsmCertificate.crt</p>
+<p>openssl x509 -req -days 3652 -in cluster-&lt;id_del_cluster&gt;_ClusterCsr.csr \<br>
+-CA customerCA.crt \<br>
+-CAkey customerCA.key \<br>
+-CAcreateserial \<br>
+-out CustomerHsmCertificate.crt<br></p>
 </li>
 <li>
 <p><strong>9.14.</strong> Use el pass phrase creado anteriormente</p>
 </li>
 <li>
 <p><strong>9.15.</strong> Inicialice el cluster con el comando:</p>
-<p>aws cloudhsmv2 initialize-cluster --cluster-id cluster-&lt;cluster_id&gt; \
---signed-cert file://CustomerHsmCertificate.crt \
---trust-anchor file://customerCA.crt</p>
+<p>aws cloudhsmv2 initialize-cluster --cluster-id cluster-&lt;cluster_id&gt; \<br>
+--signed-cert file://CustomerHsmCertificate.crt \<br>
+--trust-anchor file://customerCA.crt<br></p>
 </li>
 <li>
 <p><strong>9.16.</strong> Vuelva a la pestaña o ventana del navegador en el servicio <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></p>
 </li>
 <li><strong>9.17.</strong> Haga click en el botón de refrescar y vea que el status del cluster esta en <strong>Initialize in progress</strong></li>
-<li><strong>9.19.</strong> El processo de inicialización del cluster puede llevar cerca de 5 minutos. Siga a la proxima etapa mientras el proceso sigue.
+<li><strong>9.10.</strong> El processo de inicialización del cluster puede llevar cerca de 5 minutos. Siga a la proxima etapa mientras el proceso sigue.
 </details></li>
 </ul>
 <h3 id="10-use-el-cliente-de-cloudhsm-para-conectar-al-cluster">10. Use el cliente de CloudHSM para conectar al cluster</h3>
@@ -296,10 +300,10 @@ aws configure<br></p>
 </li>
 <li>
 <p><strong>10.3.</strong> </p>
-<p>echo '#!/bin/sh' &gt;&gt; cloudhsm_mgmt_util.sh
-echo '/opt/cloudhsm/bin/cloudhsm_mgmt_util /opt/cloudhsm/etc/cloudhsm_mgmt_util.cfg' &gt;&gt; cloudhsm_mgmt_util.sh
-chmod +x cloudhsm_mgmt_util.sh
-ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util</p>
+<p>echo '#!/bin/sh' &gt;&gt; cloudhsm_mgmt_util.sh<br>
+echo '/opt/cloudhsm/bin/cloudhsm_mgmt_util /opt/cloudhsm/etc/cloudhsm_mgmt_util.cfg' &gt;&gt; cloudhsm_mgmt_util.sh<br>
+chmod +x cloudhsm_mgmt_util.sh<br>
+ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util<br></p>
 </li>
 <li>
 <p><strong>10.4.</strong> Vea la dirección IP del HSM en el cluster con el comando:</p>
@@ -339,26 +343,26 @@ ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util</p>
 <p>listUsers</p>
 </li>
 <li>
-<p><strong>11.10.</strong> </p>
+<p><strong>11.10.</strong> Haga login con el usuario y contraseña inicial con el comando:</p>
 <p>loginHSM PRECO admin password</p>
 </li>
 <li>
-<p><strong>11.11.</strong> </p>
-</li>
-</ul>
-<p>changePswd PRECO admin <NewPassword></p>
-<ul>
-<li><strong>11.12.</strong> Do you want to continue(y/n)? -&gt; y</li>
-<li>
-<p><strong>11.13.</strong> </p>
-<p>listUsers</p>
+<p><strong>11.11.</strong> Cambie la contraseña con el comando:</p>
+<p>changePswd PRECO admin defaultPassword</p>
 </li>
 <li>
-<p><strong>11.14.</strong> Use the “createUser“ command to create a crypto user (CU).</p>
+<p><strong>11.12.</strong> Cuando recibir el prompt <strong>Do you want to continue(y/n)?</strong> digita **y &lt;enter&gt;</p>
+</li>
+<li>
+<p><strong>11.13.</strong> Usa el comando “createUser“ para crear un crypto user (CU).</p>
 <p>createUser CU user1 defaultPassword</p>
 </li>
 <li>
-<p><strong>11.15.</strong> </p>
+<p><strong>11.14.</strong> Vea que el CloudHSM cabia el tipo de usuario del crypto officer y muestra el nuevo usuario <strong>user1</strong>:</p>
+<p>listUsers</p>
+</li>
+<li>
+<p><strong>11.15.</strong> Termine la sesión en el agente con el comando:</p>
 <p>quit</p>
 </li>
 </ul></div>

@@ -53,13 +53,16 @@
                                 <a href="../networking_setup/">Ambiente de redes</a>
                             </li>
                             <li >
-                                <a href="../cluster_init/">Inicialización del cluster</a>
+                                <a href="../cluster_init/">Inicialización</a>
                             </li>
                             <li class="active">
                                 <a href="./">Gestión de llaves</a>
                             </li>
                             <li >
                                 <a href="../website/">Website</a>
+                            </li>
+                            <li >
+                                <a href="../acm/">ACM</a>
                             </li>
                         </ul>
 
@@ -89,8 +92,10 @@
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#gestion-llaves">Gestión llaves</a></li>
             <li><a href="#1-creando-llaves-en-el-hsm">1. Creando llaves en el HSM</a></li>
-            <li><a href="#2-importando-y-exportando-llaves-con-el-cloudhsm">2. Importando y exportando llaves con el CloudHSM</a></li>
-            <li><a href="#3-cree-un-cluster-de-cloudhsm">3. Cree un cluster de CloudHSM</a></li>
+            <li><a href="#2-importando-una-llave-aes-256-al-cloudhsm">2. Importando una llave AES-256 al CloudHSM</a></li>
+            <li><a href="#3-exportando-la-llave-aes-256-del-cloudhsm">3. Exportando la llave AES-256 del CloudHSM</a></li>
+            <li><a href="#4-usando-openssl-con-llaves-en-el-cloudhsm">4. Usando openssl con llaves en el CloudHSM</a></li>
+            <li><a href="#5-ponga-el-certificado-y-fake_pem-en-el-bucket-s3">5. Ponga el certificado y fake_pem en el bucket S3</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
@@ -100,117 +105,147 @@
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br />
-En este modulo "you will be using key_mgmt_util software provided in cloudHSM Client package to create symmmetric keys, RSA Key pair and ECC key pair."</p>
+En este modulo se creará varios tipos de llaves (simetricas y asimétricas)</p>
 <ul>
 <li><strong>1.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ssm/home">AWS Systems Manager</a> en la terminal de la instancia</li>
 <li>
-<p><strong>1.2.</strong> Conectese al </p>
+<p><strong>1.2.</strong> Inicie el servicio cliente del CloudHSM</p>
 <p>sudo systemctl start cloudhsm-client</p>
 </li>
 <li>
-<p><strong>1.3.</strong> Conectese al </p>
+<p><strong>1.3.</strong> Inicie el agente de gestión de llaves</p>
 <p>./key_mgmt_util</p>
 </li>
 <li>
-<p><strong>1.4.</strong> </p>
+<p><strong>1.4.</strong> Haga login con el usuario crypto user creado</p>
 <p>loginHSM -u CU -s user1 -p defaultPassword</p>
 </li>
 <li>
-<p><strong>1.5.</strong> </p>
+<p><strong>1.5.</strong> Genere una llave simetrica AES-256 con el comando:</p>
 <p>genSymKey -t 31 -s 32 -l aes256</p>
 </li>
+</ul>
+<p>Entre el <strong>Key Handle</strong> de esa llave: <input type="text" id="aes-256-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+<ul>
 <li>
-<p><strong>1.6.</strong> </p>
+<p><strong>1.6.</strong> Genere una llave asimétrica RSA con el comando:</p>
 <p>genRSAKeyPair -m 2048 -e 65541 -l rsa_test</p>
 </li>
+</ul>
+<p>Entre el <strong>Key Handle</strong> de esa llave: <input type="text" id="rsa-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+<ul>
 <li>
-<p><strong>1.7.</strong> </p>
+<p><strong>1.7.</strong> Genere una llave de curva elíptica con el comando:</p>
 <p>genECCKeyPair -i 12 -l ecc12</p>
 </li>
 <li>
-<p><strong>1.8.</strong> </p>
+<p><strong>1.8.</strong> Saiga del agente con el comando:</p>
 <p>exit
 </details></p>
 </li>
 </ul>
-<h3 id="2-importando-y-exportando-llaves-con-el-cloudhsm">2. Importando y exportando llaves con el CloudHSM</h3>
-<p><details closed>
+<h3 id="2-importando-una-llave-aes-256-al-cloudhsm">2. Importando una llave AES-256 al CloudHSM</h3>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br />
-En este modulo "you will be using key_mgmt_util software provided in cloudHSM Client package to import symmetric keys, export symmetric keys and wrap keys."</p>
+En este modulo se va a importar una llave simetrica AES-256 al CloudHSM</p>
 <ul>
 <li><strong>2.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ssm/home">AWS Systems Manager</a> en la terminal de la instancia</li>
 <li>
-<p><strong>2.2.</strong> The first command uses OpenSSL to generate a random 256-bit AES symmetric key. It saves the key in the aes256.key file.</p>
+<p><strong>2.2.</strong> Genere una llave simetrica AES-256 para importación con la herramienta openssl</p>
 <p>openssl rand -out aes256-forImport.key 32</p>
 </li>
 <li>
-<p><strong>2.3.</strong> Conectese al </p>
+<p><strong>2.3.</strong> Inicie el agente de gestión de llaves</p>
 <p>./key_mgmt_util</p>
 </li>
 <li>
-<p><strong>2.4.</strong> </p>
+<p><strong>2.4.</strong> Haga login con el usuario crypto user creado</p>
 <p>loginHSM -u CU -s user1 -p defaultPassword</p>
 </li>
 <li>
-<p><strong>2.5.</strong> Generate a wrapping key on the HSM and take note of the key handle returned.You will reuire it in the below exercises.</p>
-<p>genSymKey -t 31 -s 32 -l wrappinhKey</p>
-</li>
-<li>
-<p><strong>2.6.</strong> Use the imSymKey to import the AES key from the aes256.key file into the HSMs.</p>
-<p>imSymKey -f aes256.key -w <wrapping key handle> -t 31 -l imported</p>
-</li>
-<li>
-<p><strong>2.7.</strong> Generate a 3DES key and note the key handle returned. This key will be exported later</p>
-<p>genSymKey -t 21 -s 24 -l 3DES_export</p>
-</li>
-<li>
-<p><strong>2.8.</strong> This command exports a Triple DES (3DES) symmetric key (key handle -k). It uses an existing AES key (key handle -w) in the HSM as the wrapping key. Then it writes the plaintext of the 3DES key to the 3DES.key file.</p>
-<p>exSymKey -k <handle for 3DES key> -w <wrapping key handle> -out 3DES.key</p>
-</li>
-<li>
-<p><strong>2.9.</strong> </p>
-<p>openssl enc -d -aes-256-cbc -in plain.txt -out encr.txt -pass file:./3DES.key</p>
-</li>
-<li>
-<p><strong>1.1.</strong> </p>
+<p><strong>2.5.</strong> Use el comando imSymKey para importar al CloudHSM la llave AES-256 generada con openssl en el paso anteriormente.</p>
+<p>imSymKey -f aes256-forImport.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -t 31 -l imported
+</details></p>
 </li>
 </ul>
-<pre><code>
-</code></pre>
-
-<ul>
-<li><strong>1.1.</strong> </li>
-</ul>
-<pre><code>
-</code></pre>
-
-<ul>
-<li><strong>1.1.</strong> </li>
-</ul>
-<pre><code>
-</code></pre>
-
-<ul>
-<li><strong>1.1.</strong> </li>
-</ul>
-<pre><code>
-</code></pre>
-
-<ul>
-<li><strong>1.1.</strong> </li>
-</ul>
-<pre><code>
-</code></pre>
-
-</details>
-
-<h3 id="3-cree-un-cluster-de-cloudhsm">3. Cree un cluster de CloudHSM</h3>
-<p><details closed>
+<h3 id="3-exportando-la-llave-aes-256-del-cloudhsm">3. Exportando la llave AES-256 del CloudHSM</h3>
+<p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>3.1.</strong> </li>
+<li>
+<p><strong>3.1.</strong> Genere una wrapping key en el CloudHSM y tome nota de su <strong>key handle</strong></p>
+<p>genSymKey -t 31 -s 32 -l wrappingKey</p>
+</li>
+</ul>
+<p>Llene el <strong>Key Handle</strong> del wrapping key: <input type="text" id="wrapping-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+<ul>
+<li>
+<p><strong>3.2.</strong> Exporte en texto plano la llave AES-256 creada anteriormente (key handle -k). El agente usa una llave AES-256 de wrapping creada anteriormente(key handle -w) en el CloudHSM. Entonces escribe la llave en texto plano al archivo AES-256-CHSM-unencrypted.key.</p>
+<p>exSymKey -k <span class="aes-256-key-handle">&lt;AES-256 key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out AES-256-CHSM-unencrypted.key</p>
+</li>
+<li>
+<p><strong>3.2.</strong> Importe la llave AES-256 en texto plano creada anteriormente (key handle -k).</p>
+<p>imSymKey -t 31 -f AES-256-CHSM-unencrypted.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -l imported_fromPlaintext<br></p>
+</li>
+<li>
+<p><strong>3.3.</strong> Exporte la misma llave AES-256 de manera cifrada con el comando:</p>
+<p>wrapKey -k <span class="aes-256-key-handle">&lt;AES-256 key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out AES-256-CHSM-encrypted.key<br></p>
+</li>
+<li>
+<p><strong>3.4.</strong> Vuelva a importar esa llave cifrada al CloudHSM:</p>
+<p>unWrapKey -f AES-256-CHSM-encrypted.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span><br></p>
+</li>
+<li>
+<p><strong>3.5.</strong> Saiga del agente con el comando:</p>
+<p>exit
+</details></p>
+</li>
+</ul>
+<h3 id="4-usando-openssl-con-llaves-en-el-cloudhsm">4. Usando openssl con llaves en el CloudHSM</h3>
+<p><details open>
+<summary><strong>(detalles)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>4.1.</strong> Instale la libreria</p>
+<p>wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-dyn-latest.el7.x86_64.rpm<br>
+sudo yum install -y ./cloudhsm-client-dyn-latest.el7.x86_64.rpm<br></p>
+</li>
+<li>
+<p><strong>4.2.</strong> Configure las credenciales</p>
+<p>export n3fips_password=user1:defaultPassword<br></p>
+</li>
+<li>
+<p><strong>4.3.</strong> Cree un key pair</p>
+<p>openssl genrsa -engine cloudhsm -out fake_pem.key 2048<br></p>
+</li>
+<li>
+<p><strong>4.4.</strong> Cree un CSR</p>
+<p>openssl req -engine cloudhsm -new -key fake_pem.key -out webserver.csr<br></p>
+</li>
+<li>
+<p><strong>4.4.</strong> Cree un Certificado auto-firmado con el comando:</p>
+<p>openssl x509 -engine cloudhsm -req -days 365 -in webserver.csr -signkey fake_pem.key -out webserver.crt<br>
+</details></p>
+</li>
+</ul>
+<h3 id="5-ponga-el-certificado-y-fake_pem-en-el-bucket-s3">5. Ponga el certificado y fake_pem en el bucket S3</h3>
+<p><details open>
+<summary><strong>(detalles)</strong></summary>
+<br /></p>
+<p>Entre <strong>su user id</strong> de esa llave: <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
+<br></p>
+<ul>
+<li>
+<p><strong>5.1.</strong> Envie el archivo PEM de llave y el certificado generado al bucket S3 con los comandos</p>
+<p>aws s3 cp ./fake_pem.key s3://crypto-<span class="user-id">&lt;su user id&gt;</span>/<br>
+aws s3 cp ./webserver.crt s3://crypto-<span class="user-id">&lt;su user id&gt;</span>/<br></p>
+</li>
 </ul></div>
         </div>
 

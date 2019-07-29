@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Website - CloudHSM Workshop</title>
+        <title>ACM - CloudHSM Workshop</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -58,11 +58,11 @@
                             <li >
                                 <a href="../key_management/">Gestión de llaves</a>
                             </li>
-                            <li class="active">
-                                <a href="./">Website</a>
-                            </li>
                             <li >
-                                <a href="../acm/">ACM</a>
+                                <a href="../website/">Website</a>
+                            </li>
+                            <li class="active">
+                                <a href="./">ACM</a>
                             </li>
                         </ul>
 
@@ -73,12 +73,12 @@
                             </a>
                         </li>
                             <li >
-                                <a rel="next" href="../key_management/">
+                                <a rel="next" href="../website/">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
-                            <li >
-                                <a rel="prev" href="../acm/">
+                            <li class="disabled">
+                                <a rel="prev" >
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -92,8 +92,8 @@
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#creando-un-website-cifrado-con-tls-usando-llaves-del-cloudhsm">Creando un Website cifrado con TLS usando llaves del CloudHSM</a></li>
             <li><a href="#1-cree-un-usuario-para-el-servidor-web-y-comparta-llave-privada">1. Cree un usuario para el servidor web y comparta llave privada</a></li>
-            <li><a href="#2-cree-un-servidor-web-usando-la-llave-en-el-cloudhsm">2. Cree un servidor web usando la llave en el CloudHSM</a></li>
-            <li><a href="#3-haga-la-configuracion-del-webserver1">3. Haga la configuración del webserver1</a></li>
+            <li><a href="#2-cree-un-balanceador-usando-el-certificado-importado">2. Cree un balanceador usando el certificado importado</a></li>
+            <li><a href="#3-agregue-http-al-security-group-el-webserver1">3. Agregue HTTP al Security Group el webserver1</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
@@ -108,144 +108,109 @@
 <li><strong>1.2.</strong> Seleccione el <strong>Logs</strong> en el menu lateral</li>
 <li><strong>1.3.</strong> Haga click en el "Log Group" con el nombre <strong>/aws/cloudhsm/cluster-&lt;cluster_id&gt;</strong> y después en <strong>Search Log Group</strong></li>
 <li><strong>1.4.</strong> Filtre los logs por el evento de generación de par de llaves <strong>CN_GENERATE_KEY_PAIR</strong></li>
-<li><strong>1.5.</strong> Haga click en la flecha para expandir los logs</li>
-</ul>
+<li>
+<p><strong>1.5.</strong> Haga click en la flecha para expandir los logs</p>
 <p>Entre el <strong>Key Handle</strong> de la llave publica generado con openssl: <input type="text" id="openssl-priv-key-handle" onkeyup="copyval(this);"/><br>
 <br></p>
-<ul>
-<li><strong>1.6.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</li>
+</li>
+<li>
+<p><strong>1.6.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</p>
+</li>
 <li>
 <p><strong>1.7.</strong> Entre en el agente de administración del cluster con el comando:</p>
 <p>./cloudhsm_mgmt_util.sh</p>
 </li>
 <li>
-<p><strong>1.8.</strong> Login</p>
-<p>loginHSM CO admin defaultPassword</p>
+<p><strong>1.8.</strong> Haga login en el CloudHSM</p>
+<p>loginHSM -u CU -s user1 -p defaultPassword</p>
 </li>
 <li>
-<p><strong>1.9.</strong> Cree un nuevo usuario para el servidor web</p>
-<p>createUser CU webserver1 defaultPassword</p>
+<p><strong>1.9.</strong> Exporte la llave publica generado con el openssl:</p>
+<p>exportPrivateKey -k 262166 -w 262167 -out webserver.pem</p>
 </li>
 <li>
-<p><strong>1.10.</strong> </p>
-<p>logoutHSM</p>
+<p><strong>1.10.</strong> Saiga el cliente:</p>
+<p>exit</p>
 </li>
 <li>
-<p><strong>1.11.</strong> Login</p>
-<p>loginHSM CU user1 defaultPassword</p>
+<p><strong>1.11.</strong> Abra en una nueva pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/acm/home">AWS Certificate Manager</a></p>
+</li>
+<li><strong>1.12.</strong> Si ves la opción <strong>Get started</strong> haga click en el que esta debajo de <strong>Provision certificates</strong></li>
+<li><strong>1.13.</strong> Haga click en <strong>Import a certificate</strong></li>
+<li>
+<p><strong>1.14.</strong> En la ventana de terminal del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a>, ejecute el comando:</p>
+<p>cat webserver.crt</p>
 </li>
 <li>
-<p><strong>1.12.</strong> </p>
-<p>listUsers</p>
+<p><strong>1.15.</strong> Copie la informacion y la pegue en el campo <strong>Certificate body</strong></p>
 </li>
+<li>
+<p><strong>1.16.</strong> En la ventana de terminal del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a>, ejecute el comando:</p>
+<p>cat webserver.pem</p>
+</li>
+<li>
+<p><strong>1.17.</strong> Copie la informacion y la pegue en el campo <strong>Certificate private key</strong></p>
+</li>
+<li><strong>1.18.</strong> Haga click en <strong>Import</strong></li>
+<li><strong>1.19.</strong> Revise el mensaje y haga click de nuevo en <strong>Import</strong>
+</details></li>
 </ul>
-<p>Entre el <strong>User ID</strong> del usuario <strong>webserver1</strong>: <input type="text" id="webserver1-user-id" onkeyup="copyval(this);"/><br>
-<br></p>
-<ul>
-<li>
-<p><strong>1.13.</strong> Comparta la llave privada con el usuario webserver1 con el comando:</p>
-<p>shareKey <span class="openssl-priv-key-handle">&lt;public key handle&gt;</span> <span class="webserver1-user-id">&lt;webserver1 user id&gt;</span>  1
-</details></p>
-</li>
-</ul>
-<h3 id="2-cree-un-servidor-web-usando-la-llave-en-el-cloudhsm">2. Cree un servidor web usando la llave en el CloudHSM</h3>
+<h3 id="2-cree-un-balanceador-usando-el-certificado-importado">2. Cree un balanceador usando el certificado importado</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>2.1.</strong> Vuelva a pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a></li>
-<li><strong>2.2.</strong> Haga click en <strong>Launch Instance</strong></li>
-<li><strong>2.3.</strong> Seleccione la AMI <strong>Amazon Linux 2 AMI</strong> haciendo click en <strong>Select</strong> en la linea que corresponde</li>
-<li><strong>2.4.</strong> Deje seleccionado el tipo de instancia t2.micro y haga click en <strong>Next: Configure Instance Details</strong></li>
-<li><strong>2.5.</strong> En la opción <strong>Network</strong> elija la VPC con nombre <strong>cloudhsm-vpc</strong></li>
-<li><strong>2.6.</strong> En la opción <strong>Subnet</strong> elija la Subnet con nombre <strong>public-subnet-us-east-1a</strong></li>
-<li><strong>2.7.</strong> En IAM role seleccione el perfil <strong>EC2-SSM+S3Crypto</strong> y haga click en <strong>Next: Add Storage</strong></li>
-<li><strong>2.8.</strong> Haga click en <strong>Next: Add Tags</strong></li>
-<li><strong>2.9.</strong> Haga click en <strong>Add Tag</strong>, en el campo "Key" llene con <strong>Name</strong> y en el campo "Value" llene con <strong>webserver1</strong></li>
-<li><strong>2.10.</strong> Haga click en <strong>Next: Configure Security Group</strong></li>
-<li><strong>2.11.</strong> Deje <strong>Create a new security group</strong> seleccionado y en "Security group name" llene con <strong>webserver1-sg</strong></li>
-<li><strong>2.12.</strong> Borre la linea de configuración de acceso SSH haciendo click en el icono <strong>X</strong></li>
-<li><strong>2.13.</strong> Haga click en <strong>Add Rule</strong>, en el campo "Type" seleccione <strong>HTTPS</strong> y deje los otros campos con el valor por defecto</li>
-<li><strong>2.14.</strong> Haga click en <strong>Review and Launch</strong> y después en <strong>Launch</strong></li>
-<li><strong>2.15.</strong> Remplaze la opción "Choose an existing key pair" por <strong>Proceed without a key pair</strong></li>
-<li><strong>2.16.</strong> Seleccione <strong>I acknowledge that I will not (...)</strong> y haga click en <strong>Launch Instance</strong></li>
-<li><strong>2.17.</strong> Haga click en <strong>View Instances</strong></li>
-<li><strong>2.18.</strong> Seleccione la instancia con nombre <strong>webserver1</strong></li>
-<li><strong>2.19.</strong> Haga click en <strong>Actions</strong>, seleccione <strong>Networking</strong> y haga click en <strong>Change Security Groups</strong></li>
-<li><strong>2.20.</strong> Deje seleccionado el Security Group <strong>webserver1-sg</strong> y seleccione también el grupo **cloudhsm-cluster-&lt;cluster id&gt;-sg</li>
-<li><strong>2.21.</strong> Haga click en <strong>Assign Security Groups</strong></li>
-<li><strong>2.22.</strong> Tome nota de la dirección IP publica en <strong>IPv4 Public IP</strong></li>
-</ul>
-<p>Entre <strong>IP Address</strong>: <input type="text" id="instance-ip" onkeyup="copyval(this);"/><br>
+<li><strong>2.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a></li>
+<li><strong>2.2.</strong> En el menu lateral haga click en <strong>Load Balancers</strong></li>
+<li><strong>2.3.</strong> Haga click en <strong>Create Load Balancer</strong></li>
+<li><strong>2.4.</strong> Haga click en <strong>Create</strong> debajo de <strong>Application Load Balancer</strong></li>
+<li><strong>2.5.</strong> En <strong>Name</strong> llene con <strong>acm-webserver</strong></li>
+<li><strong>2.6.</strong> En <strong>Listeners</strong>, cambie el protocolo de "HTTP" a <strong>HTTPS</strong></li>
+<li><strong>2.7.</strong> En <strong>VPC</strong> seleccione el que tiene nombre <strong>cloudhsm-vpc</strong></li>
+<li><strong>2.8.</strong> Seleccione las AZ <strong>us-east-1a</strong> y <strong>us-east-1b</strong> y seleccione las subnets <strong>public</strong> para cada una.</li>
+<li><strong>2.9.</strong> Haga click en <strong>Next: Configure Security Settings</strong></li>
+<li><strong>2.10.</strong> Deje seleccionado **Choose a certificate from ACM (recommended) y seleccione el certificado importado anteriormente</li>
+<li><strong>2.11.</strong> Haga click en <strong>Next: Configure Security Groups</strong></li>
+<li><strong>2.12.</strong> Seleccione <strong>Create a new security group</strong></li>
+<li><strong>2.13.</strong> En <strong>Security group name</strong> llene con <strong>acm-webserver-sg</strong></li>
+<li><strong>2.14.</strong> En "Type" seleccione <strong>HTTPS</strong></li>
+<li><strong>2.15.</strong> Haga click en <strong>Next: Configure Routing</strong></li>
+<li><strong>2.16.</strong> En <strong>Name</strong> llene con <strong>webserver1</strong></li>
+<li><strong>2.17.</strong> Haga click en <strong>Advanced health check settings</strong></li>
+<li><strong>2.18.</strong> En la opción <strong>Healthy threashold</strong> cambie el valor para 2</li>
+<li><strong>2.19.</strong> En la opción <strong>Interval</strong> cambie el valor para 10</li>
+<li><strong>2.20.</strong> Haga click en <strong>Next: Register Targets</strong></li>
+<li><strong>2.21.</strong> En la sección <strong>Instances</strong> seleccione la instancia <strong>webserver1</strong> y haga click en <strong>Add to registered</strong></li>
+<li><strong>2.22.</strong> Haga click en <strong>Next: Review</strong> y después en <strong>Create</strong></li>
+<li><strong>2.23.</strong> Haga click en <strong>Close</strong></li>
+<li>
+<p><strong>2.24.</strong> Llene abajo la información del nombre DNS el balanceador:</p>
+<p>Entre el <strong>DNS name</strong> del balanceador: <input type="text" id="lb-dns" onkeyup="copyval(this);"/><br>
 <br>
 </details></p>
-<h3 id="3-haga-la-configuracion-del-webserver1">3. Haga la configuración del webserver1</h3>
+</li>
+</ul>
+<h3 id="3-agregue-http-al-security-group-el-webserver1">3. Agregue HTTP al Security Group el webserver1</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
-<p>Entre <strong>su user id</strong>: <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
-Entre <strong>HSM IP Address</strong>: <input type="text" id="cloudhsm-ip" onkeyup="copyval(this);"/><br>
-<br></p>
 <ul>
-<li><strong>3.1.</strong> Vuelva a pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a></li>
-<li><strong>3.2.</strong> Haga click en <strong>Start session</strong></li>
-<li><strong>3.3.</strong> Seleccione el <strong>webserver1</strong> y haga click en <strong>Start session</strong></li>
-<li>
-<p><strong>3.4.</strong> Haga click en la terminal y digite:</p>
-<p>cd &lt;enter&gt;</p>
-</li>
-<li>
-<p><strong>3.5.</strong> Actualize el software del Sistema Operativo y instale las librerias de CloudHSM y nginx</p>
-<p>sudo yum update -y<br>
-wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL6/cloudhsm-client-latest.el6.x86_64.rpm<br>
-wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-dyn-latest.el7.x86_64.rpm<br>
-sudo yum install ./cloudhsm-client-latest.el6.x86_64.rpm -y<br>
-sudo yum install -y ./cloudhsm-client-dyn-latest.el7.x86_64.rpm<br>
-sudo amazon-linux-extras install nginx1.12 -y<br></p>
-</li>
-<li>
-<p><strong>3.6.</strong> Configure el cliente del CloudHSM con los comandos:</p>
-<p>sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/customerCA.crt /opt/cloudhsm/etc/customerCA.crt<br>
-sudo /opt/cloudhsm/bin/configure -a <span class="cloudhsm-ip">&lt;su_user_id&gt;</span><br>
-sudo systemctl start cloudhsm-client<br></p>
-</li>
-<li>
-<p><strong>3.7.</strong> Cree una carpeta y copie los archivos de certificados y llaves necesarios desde el bucket S3 con los comandos:</p>
-<p>sudo mkdir -p /etc/pki/nginx/private<br>
-sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/fake_pem.key /etc/pki/nginx/private/server.key<br>
-sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/webserver.crt /etc/pki/nginx/server.crt<br></p>
-</li>
-<li>
-<p><strong>3.8.</strong> Cambie la configuración de permisos del archivo de llaves fake:</p>
-<p>sudo chown nginx /etc/pki/nginx/server.crt /etc/pki/nginx/private/server.key<br></p>
-</li>
-<li>
-<p><strong>3.9.</strong> Cambie el archivo de configuración del nginx para usar el engine de CloudHSM</p>
-<p>sudo sed -i '5issl_engine cloudhsm;' /etc/nginx/nginx.conf<br></p>
-</li>
-<li>
-<p><strong>3.10.</strong> Remueva los comantarios de la sección del servicio HTTPS del nginx:</p>
-<p>sudo nano /etc/nginx/nginx.conf<br></p>
-</li>
+<li><strong>3.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a></li>
+<li><strong>3.2.</strong> En el menu lateral haga click en <strong>Security Groups</strong></li>
+<li><strong>3.3.</strong> Seleccione el <strong>webserver1-sg</strong> y haga click en la pestaña <strong>Inbound</strong></li>
+<li><strong>3.4.</strong> Haga click en <strong>Edit</strong> y después en <strong>Add Rule</strong></li>
+<li><strong>3.5.</strong> En la ultima linea que se creo, seleccione el tipo <strong>HTTP</strong> y en "Source" remplaze el "0.0.0.0/0" por <strong>acm-web</strong> y cuando aparecer el id, seleccione el <strong>sg-xxxxxxxxxxx</strong></li>
+<li><strong>3.6.</strong> Haga click en <strong>Save</strong></li>
+<li><strong>3.7.</strong> En el menu lateral haga click en <strong>Target Groups</strong></li>
+<li><strong>3.8.</strong> Seleccione el <strong>webserver1</strong> y haga click en la pestaña <strong>Targets</strong></li>
+<li><strong>3.9.</strong> Vea si la instancia muestra <strong>Status</strong> como <strong>healthy</strong></li>
+<li><strong>3.10.</strong> Si todavía sigue <strong>unhealthy</strong> espere alguns segundos, haga click en icono de refresh hasta que cambie de estado</li>
+<li><strong>3.11.</strong> Pruebe si el servicio funciona correctamente en:</li>
 </ul>
-<p>Desca hasta la linea siguiente a <strong># Settings for a TLS enabled server.</strong> y usando <strong>Ctrl+d</strong> para quitar los caracteres "#". Para grabar use <strong>Ctrl+s</strong> y para salir <strong>Ctrl+x</strong></p>
+<p><a href="https://&lt;span class=&quot;lb-dns&quot;&gt;&lt;ELB DNS name&gt;&lt;/span&gt;/">https://<span class="lb-dns">&lt;ELB DNS name&gt;</span></a><br></p>
 <ul>
-<li>
-<p><strong>3.11.</strong> Cambie los archivos de configuración del nginx con los comandos:</p>
-<p>sudo sed -i '11iEnvironmentFile=/etc/sysconfig/nginx' /lib/systemd/system/nginx.service<br>
-echo 'n3fips_password=webserver1:defaultPassword' | sudo tee -a /etc/sysconfig/nginx<br></p>
-</li>
-<li>
-<p><strong>3.12.</strong> Inicie el servicio nginx</p>
-<p>sudo systemctl start nginx<br></p>
-</li>
-<li>
-<p><strong>3.13.</strong> Pruebe si el servicio funciona correctamente en <a href="https://&lt;span class=&quot;instance-ip&quot;&gt;&lt;instance Public IP&gt;&lt;/span&gt;/">https://<span class="instance-ip">&lt;instance Public IP&gt;</span></a><br></p>
-</li>
-<li>
-<p><strong>3.14.</strong> Accepte el certificado digital auto-firmado haciendo click en <strong>Advanced...</strong> y <strong>Accept the Risk and Continue</strong>
-</details></p>
-</li>
+<li><strong>3.12.</strong> Accepte el certificado digital auto-firmado haciendo click en <strong>Advanced...</strong> y <strong>Accept the Risk and Continue</strong>
+</details></li>
 </ul></div>
         </div>
 
