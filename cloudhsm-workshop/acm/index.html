@@ -113,7 +113,9 @@
 <li><strong>1.4.</strong> Filtre los logs por el evento de generación de par de llaves <strong>CN_GENERATE_KEY_PAIR</strong></li>
 <li>
 <p><strong>1.5.</strong> Haga click en la flecha para expandir los logs</p>
-<p>Entre el <strong>Key Handle</strong> de la llave publica generado con openssl: <input type="text" id="openssl-priv-key-handle" onkeyup="copyval(this);"/><br>
+<p>Entre el <strong>Key Handle</strong> de la llave privada generada con openssl: <input type="text" id="openssl-priv-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+<p>Entre el <strong>Key Handle</strong> de la llave de wrapping generada en el CloudHSM: <input type="text" id="wrapping-key-handle" onkeyup="copyval(this);"/><br>
 <br></p>
 </li>
 <li>
@@ -129,7 +131,7 @@
 </li>
 <li>
 <p><strong>1.9.</strong> Exporte la llave publica generado con el openssl:</p>
-<p>exportPrivateKey -k 262166 -w 262167 -out webserver.pem</p>
+<p>exportPrivateKey -k <span class="openss-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver.pem</p>
 </li>
 <li>
 <p><strong>1.10.</strong> Saiga el cliente:</p>
