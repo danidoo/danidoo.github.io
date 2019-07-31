@@ -91,15 +91,22 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#aws-key-management-service">AWS Key Management Service</a></li>
-            <li><a href="#aws-key-management-service_1">AWS Key Management Service</a></li>
+            <li><a href="#1-cree-un-perfil-para-una-instancia-ec2">1. Cree un perfil para una instancia EC2</a></li>
+            <li><a href="#2-cree-un-bucket-s3">2. Cree un bucket S3</a></li>
+            <li><a href="#3-cree-una-instancia-ec2">3. Cree una instancia EC2</a></li>
+            <li><a href="#4-pruebe-el-acceso-de-la-instancia-al-bucket-s3">4. Pruebe el acceso de la instancia al bucket S3</a></li>
+            <li><a href="#5-agregue-permissos-de-acceso-al-s3-a-la-instancia">5. Agregue permissos de acceso al S3 a la instancia</a></li>
+            <li><a href="#6-cree-una-customer-master-key">6. Cree una Customer Master Key</a></li>
+            <li><a href="#7-configure-el-bucket-para-encripcion-agregue-un-objeto-y-pruebe-el-acceso">7. Configure el bucket para encripción, agregue un objeto y pruebe el acceso</a></li>
+            <li><a href="#8-cambie-los-permisos-de-acceso-a-la-llave-y-intente-de-nuevo">8. Cambie los permisos de acceso a la llave y intente de nuevo</a></li>
+            <li><a href="#9-configure-el-rotacionamiento-automatico-de-la-llave">9. Configure el rotacionamiento automatico de la llave</a></li>
+            <li><a href="#10-agregue-permissos-de-acceso-al-aws-kms-a-la-instancia">10. Agregue permissos de acceso al AWS KMS a la instancia</a></li>
+            <li><a href="#11-haga-encripcion-del-lado-del-cliente-usando-llaves-del-kms">11. Haga encripción del lado del cliente usando llaves del KMS</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
 <h1 id="aws-key-management-service">AWS Key Management Service</h1>
-<h2 id="aws-key-management-service_1">AWS Key Management Service</h2>
-<p>As práticas recomendadas sugerem o uso de criptografia de dados em repouso com base nos padrões e práticas recomendadas mais recentes para ajudar a proteger seus dados. Além disso, as chaves de criptografia devem ser armazenadas com segurança, rotacionadas e seu acesso deve ser controladoe restrito; por exemplo, usando um serviço de gerenciamento de chaves, como o AWS Key Management Service.</p>
-<p>Neste laboratório será usado o serviço AWS Key Management Service para criar e gerenciar o controle de acesso às chaves, assim como o Amazon S3 para armazenar objetos criptografados usando estas chaves.</p>
 <h3 id="1-cree-un-perfil-para-una-instancia-ec2">1. Cree un perfil para una instancia EC2</h3>
 <p><details open>
 <summary>(detalles)</summary></p>
@@ -111,11 +118,13 @@
 <li><strong>1.5.</strong> Haga click en <strong>Next: Review</strong> (Tags no van a ser necesarios en ese momento)</li>
 <li><strong>1.6.</strong> En el campo <strong>Role name</strong> llene con el nombre <strong>EC2-Role</strong> y haga click en <strong>Create role</strong></li>
 <li><strong>1.7.</strong> En el topo de la pantalla aparecerá el mensaje "The role EC2-SSM-S3 has been created", haga click en el enlace <strong>EC2-Role</strong></li>
-<li><strong>1.8.</strong> Tome nota del ARN (Amazon Resource Name) en <strong>Role ARN</strong> (formato <em>arn:aws:iam::XXXXXXXXXXXX:role/EC2-SSM-S3</em>)</li>
-</ul>
+<li>
+<p><strong>1.8.</strong> Tome nota del ARN (Amazon Resource Name) en <strong>Role ARN</strong> (formato <em>arn:aws:iam::XXXXXXXXXXXX:role/EC2-SSM-S3</em>)</p>
 <p>Entre el <strong>ARN</strong> del perfil: <input type="text" id="ec2-role-arn" onkeyup="copyval(this);"/><br>
 <br>
 </details></p>
+</li>
+</ul>
 <h3 id="2-cree-un-bucket-s3">2. Cree un bucket S3</h3>
 <p><details open>
 <summary>(detalles)</summary></p>
@@ -123,11 +132,13 @@
 <li><strong>2.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/s3/home">AWS S3</a></li>
 <li><strong>2.2.</strong> Haga click en <strong>+ Create bucket</strong></li>
 <li><strong>2.3.</strong> En el campo <strong>Bucket name</strong> llene el texto <strong>s3encrypted-&lt;su user id&gt;</strong></li>
-<li><strong>2.4.</strong> Verifique que em <strong>Region</strong> está selecionado <strong>US East (N. Virginia) e clique em </strong>Create**</li>
-</ul>
+<li>
+<p><strong>2.4.</strong> Verifique que em <strong>Region</strong> está selecionado <strong>US East (N. Virginia) e clique em </strong>Create**</p>
 <p>Entre el <strong>Nombre final</strong> del bucket: <input type="text" id="bucket-name" onkeyup="copyval(this);"/><br>
 <br>
 </details></p>
+</li>
+</ul>
 <h3 id="3-cree-una-instancia-ec2">3. Cree una instancia EC2</h3>
 <p><details open>
 <summary>(detalles)</summary></p>
@@ -191,11 +202,13 @@
 <li><strong>6.5.</strong> Haga click en<strong>Next</strong></li>
 <li><strong>6.6.</strong> En las opciones de elección de administradores, deje los valores estándar y haga click en <strong>Next</strong></li>
 <li><strong>6.7.</strong> En las opciones de administradores de llaves, filtre por <strong>user1</strong>, seleccione el usuario <strong>user1</strong> y haga click en <strong>Next</strong></li>
-<li><strong>6.8.</strong> Haga click en <strong>Finish</strong></li>
-</ul>
+<li>
+<p><strong>6.8.</strong> Haga click en <strong>Finish</strong></p>
 <p>Entre el <strong>Key Id</strong> de la llave creada: <input type="text" id="cmk-key-id" onkeyup="copyval(this);"/><br>
 <br>
 </details></p>
+</li>
+</ul>
 <h3 id="7-configure-el-bucket-para-encripcion-agregue-un-objeto-y-pruebe-el-acceso">7. Configure el bucket para encripción, agregue un objeto y pruebe el acceso</h3>
 <p><details open>
 <summary>(detalles)</summary></p>
@@ -207,12 +220,14 @@
 <li><strong>7.5.</strong> Cree o elija un archivo no confidencial o personal en su computadora que no sea muy grande</li>
 <li><strong>7.6.</strong> Vuelva a la pestaña <strong>Overview</strong> y haga click en <strong>Upload</strong></li>
 <li><strong>7.7.</strong> Haga click en <strong>Add files</strong> y seleccione el archivo; o arrastre el archivo a la pantalla</li>
-<li><strong>7.8.</strong> Haga click en <strong>Upload</strong></li>
-</ul>
+<li>
+<p><strong>7.8.</strong> Haga click en <strong>Upload</strong></p>
 <p>Entre el <strong>nombre del archivo</strong>: <input type="text" id="file-name" onkeyup="copyval(this);"/><br>
 <br></p>
-<ul>
-<li><strong>7.9.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ssm/home">AWS Systems Manager</a> en la terminal de la instancia</li>
+</li>
+<li>
+<p><strong>7.9.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ssm/home">AWS Systems Manager</a> en la terminal de la instancia</p>
+</li>
 <li>
 <p><strong>7.10.</strong> Intente descargar el archivo (no será posible pues la instancia no tiene permiso a la llave de encripción)</p>
 <p>aws s3 cp s3://<span class="bucket-name">&lt;nombre del bucket&gt;</span>/<span class="file-name">&lt;nombre del archivo&gt;</span> .
