@@ -50,9 +50,6 @@
                                 <a href="..">Inicio</a>
                             </li>
                             <li >
-                                <a href="../networking_setup/">Ambiente de redes</a>
-                            </li>
-                            <li >
                                 <a href="../cluster_init/">Inicialización</a>
                             </li>
                             <li class="active">
@@ -109,6 +106,8 @@
 <summary><strong>(detalles)</strong></summary>
 <br />
 En este modulo se creará varios tipos de llaves (simetricas y asimétricas)</p>
+<p>Entre el <strong>user id</strong> o valor aleatorio usado en el modulo anterior: <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
+<br></p>
 <ul>
 <li><strong>1.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ssm/home">AWS Systems Manager</a> en la terminal de la instancia</li>
 <li>
@@ -126,25 +125,28 @@ En este modulo se creará varios tipos de llaves (simetricas y asimétricas)</p>
 <li>
 <p><strong>1.5.</strong> Genere una llave simetrica AES-256 con el comando:</p>
 <p>genSymKey -t 31 -s 32 -l aes256</p>
-</li>
-</ul>
 <p>Entre el <strong>Key Handle</strong> de esa llave: <input type="text" id="aes-256-key-handle" onkeyup="copyval(this);"/><br>
 <br></p>
-<ul>
+</li>
 <li>
 <p><strong>1.6.</strong> Genere una llave asimétrica RSA con el comando:</p>
 <p>genRSAKeyPair -m 2048 -e 65541 -l rsa_test</p>
-</li>
-</ul>
 <p>Entre el <strong>Key Handle</strong> de esa llave: <input type="text" id="rsa-key-handle" onkeyup="copyval(this);"/><br>
 <br></p>
-<ul>
+</li>
 <li>
 <p><strong>1.7.</strong> Genere una llave de curva elíptica con el comando:</p>
 <p>genECCKeyPair -i 12 -l ecc12</p>
 </li>
 <li>
-<p><strong>1.8.</strong> Saiga del agente con el comando:</p>
+<p><strong>1.8.</strong> Genere una wrapping key en el CloudHSM y tome nota de su <strong>key handle</strong></p>
+<p>genSymKey -t 31 -s 32 -l wrappingKey</p>
+<p>Llene el <strong>Key Handle</strong> del wrapping key: <input type="text" id="wrapping-key-handle" onkeyup="copyval(this);"/><br>
+Tome nota también de ese numero en un editor de texto pues la va a necesitar en una etapa seguiente.
+<br></p>
+</li>
+<li>
+<p><strong>1.9.</strong> Saiga del agente con el comando:</p>
 <p>exit
 </details></p>
 </li>
@@ -161,48 +163,32 @@ En este modulo se va a importar una llave simetrica AES-256 al CloudHSM</p>
 <p>openssl rand -out aes256-forImport.key 32</p>
 </li>
 <li>
-<p><strong>2.3.</strong> Inicie el agente de gestión de llaves</p>
-<p>./key_mgmt_util</p>
-</li>
-<li>
-<p><strong>2.4.</strong> Haga login con el usuario crypto user creado</p>
-<p>loginHSM -u CU -s user1 -p defaultPassword</p>
-</li>
-<li>
-<p><strong>2.5.</strong> Use el comando imSymKey para importar al CloudHSM la llave AES-256 generada con openssl en el paso anteriormente.</p>
-<p>imSymKey -f aes256-forImport.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -t 31 -l imported
-</details></p>
+<p><strong>2.3.</strong> Use el comando imSymKey para importar al CloudHSM la llave AES-256 generada con openssl en el paso anteriormente.</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword imSymKey -f aes256-forImport.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -t 31 -l imported</p>
 </li>
 </ul>
+</details>
+
 <h3 id="3-exportando-la-llave-aes-256-del-cloudhsm">3. Exportando la llave AES-256 del CloudHSM</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
 <li>
-<p><strong>3.1.</strong> Genere una wrapping key en el CloudHSM y tome nota de su <strong>key handle</strong></p>
-<p>genSymKey -t 31 -s 32 -l wrappingKey</p>
-</li>
-</ul>
-<p>Llene el <strong>Key Handle</strong> del wrapping key: <input type="text" id="wrapping-key-handle" onkeyup="copyval(this);"/><br>
-Tome nota también de ese numero en un editor de texto pues la va a necesitar en una etapa seguiente.
-<br></p>
-<ul>
-<li>
-<p><strong>3.2.</strong> Exporte en texto plano la llave AES-256 creada anteriormente (key handle -k). El agente usa una llave AES-256 de wrapping creada anteriormente(key handle -w) en el CloudHSM. Entonces escribe la llave en texto plano al archivo AES-256-CHSM-unencrypted.key.</p>
-<p>exSymKey -k <span class="aes-256-key-handle">&lt;AES-256 key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out AES-256-CHSM-unencrypted.key</p>
+<p><strong>3.1.</strong> Exporte en texto plano la llave AES-256 creada anteriormente (key handle -k). El agente usa una llave AES-256 de wrapping creada anteriormente(key handle -w) en el CloudHSM. Entonces escribe la llave en texto plano al archivo AES-256-CHSM-unencrypted.key.</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword exSymKey -k <span class="aes-256-key-handle">&lt;AES-256 key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out AES-256-CHSM-unencrypted.key</p>
 </li>
 <li>
 <p><strong>3.2.</strong> Importe la llave AES-256 en texto plano creada anteriormente (key handle -k).</p>
-<p>imSymKey -t 31 -f AES-256-CHSM-unencrypted.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -l imported_fromPlaintext<br></p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword imSymKey -t 31 -f AES-256-CHSM-unencrypted.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -l imported_fromPlaintext<br></p>
 </li>
 <li>
 <p><strong>3.3.</strong> Exporte la misma llave AES-256 de manera cifrada con el comando:</p>
-<p>wrapKey -k <span class="aes-256-key-handle">&lt;AES-256 key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out AES-256-CHSM-encrypted.key<br></p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword wrapKey -k <span class="aes-256-key-handle">&lt;AES-256 key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out AES-256-CHSM-encrypted.key<br></p>
 </li>
 <li>
 <p><strong>3.4.</strong> Vuelva a importar esa llave cifrada al CloudHSM:</p>
-<p>unWrapKey -f AES-256-CHSM-encrypted.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span><br></p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword unWrapKey -f AES-256-CHSM-encrypted.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span><br></p>
 </li>
 <li>
 <p><strong>3.5.</strong> Saiga del agente con el comando:</p>
@@ -242,8 +228,6 @@ sudo yum install -y ./cloudhsm-client-dyn-latest.el7.x86_64.rpm<br></p>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
-<p>Entre <strong>su user id</strong> de esa llave: <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
-<br></p>
 <ul>
 <li>
 <p><strong>5.1.</strong> Envie el archivo PEM de llave y el certificado generado al bucket S3 con los comandos</p>

@@ -50,9 +50,6 @@
                                 <a href="..">Inicio</a>
                             </li>
                             <li >
-                                <a href="../networking_setup/">Ambiente de redes</a>
-                            </li>
-                            <li >
                                 <a href="../cluster_init/">Inicialización</a>
                             </li>
                             <li >
@@ -140,17 +137,26 @@
 <li>
 <p><strong>1.12.</strong> </p>
 <p>listUsers</p>
-</li>
-</ul>
 <p>Entre el <strong>User ID</strong> del usuario <strong>webserver1</strong>: <input type="text" id="webserver1-user-id" onkeyup="copyval(this);"/><br>
 <br></p>
-<ul>
+</li>
 <li>
 <p><strong>1.13.</strong> Comparta la llave privada con el usuario webserver1 con el comando:</p>
-<p>shareKey <span class="openssl-priv-key-handle">&lt;public key handle&gt;</span> <span class="webserver1-user-id">&lt;webserver1 user id&gt;</span>  1
-</details></p>
+<p>shareKey <span class="openssl-priv-key-handle">&lt;public key handle&gt;</span> <span class="webserver1-user-id">&lt;webserver1 user id&gt;</span>  1</p>
+</li>
+<li>
+<p><strong>1.14.</strong> Ahora vamos a intentar exportar la llave como el usuario webserver1. Para eso generaremos una llava para wrapping con el comando:</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword genSymKey -t 31 -s 32 -l wrappingKey</p>
+<p>Entre el <strong>Key Handle</strong> de la llave generada: <input type="text" id="webserver1-wrapping-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+</li>
+<li>
+<p><strong>1.15.</strong> Y intente exportar la llave con el comando</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword exportPrivateKey -k <span class="openssl-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="webserver1-wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver_priv.key</p>
 </li>
 </ul>
+</details>
+
 <h3 id="2-cree-un-servidor-web-usando-la-llave-en-el-cloudhsm">2. Cree un servidor web usando la llave en el CloudHSM</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
@@ -186,7 +192,7 @@
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
-<p>Entre <strong>su user id</strong>: <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
+<p>Entre el <strong>user id</strong> o valor aleatorio usado anteriormente: <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
 Entre <strong>HSM IP Address</strong>: <input type="text" id="cloudhsm-ip" onkeyup="copyval(this);"/><br>
 <br></p>
 <ul>
@@ -200,9 +206,9 @@ Entre <strong>HSM IP Address</strong>: <input type="text" id="cloudhsm-ip" onkey
 <li>
 <p><strong>3.5.</strong> Actualize el software del Sistema Operativo y instale las librerias de CloudHSM y nginx</p>
 <p>sudo yum update -y<br>
-wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL6/cloudhsm-client-latest.el6.x86_64.rpm<br>
+wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-latest.el7.x86_64.rpm<br>
 wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-dyn-latest.el7.x86_64.rpm<br>
-sudo yum install ./cloudhsm-client-latest.el6.x86_64.rpm -y<br>
+sudo yum install ./cloudhsm-client-latest.el7.x86_64.rpm -y<br>
 sudo yum install -y ./cloudhsm-client-dyn-latest.el7.x86_64.rpm<br>
 sudo amazon-linux-extras install nginx1.12 -y<br></p>
 </li>
@@ -229,10 +235,8 @@ sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/webse
 <li>
 <p><strong>3.10.</strong> Remueva los comantarios de la sección del servicio HTTPS del nginx:</p>
 <p>sudo nano /etc/nginx/nginx.conf<br></p>
+<p>Baje hasta la linea siguiente a <strong># Settings for a TLS enabled server.</strong> y usando <strong>Ctrl+d</strong> para quitar los caracteres "#". Para grabar use <strong>Ctrl+s</strong> y para salir <strong>Ctrl+x</strong></p>
 </li>
-</ul>
-<p>Desca hasta la linea siguiente a <strong># Settings for a TLS enabled server.</strong> y usando <strong>Ctrl+d</strong> para quitar los caracteres "#". Para grabar use <strong>Ctrl+s</strong> y para salir <strong>Ctrl+x</strong></p>
-<ul>
 <li>
 <p><strong>3.11.</strong> Cambie los archivos de configuración del nginx con los comandos:</p>
 <p>sudo sed -i '11iEnvironmentFile=/etc/sysconfig/nginx' /lib/systemd/system/nginx.service<br>
