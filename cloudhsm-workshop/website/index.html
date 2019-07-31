@@ -108,12 +108,14 @@
 <li><strong>1.2.</strong> Seleccione el <strong>Logs</strong> en el menu lateral</li>
 <li><strong>1.3.</strong> Haga click en el "Log Group" con el nombre <strong>/aws/cloudhsm/cluster-&lt;cluster_id&gt;</strong> y después en <strong>Search Log Group</strong></li>
 <li><strong>1.4.</strong> Filtre los logs por el evento de generación de par de llaves <strong>CN_GENERATE_KEY_PAIR</strong></li>
-<li><strong>1.5.</strong> Haga click en la flecha para expandir los logs</li>
-</ul>
+<li>
+<p><strong>1.5.</strong> Haga click en la flecha para expandir los logs</p>
 <p>Entre el <strong>Key Handle</strong> de la llave privada generada con openssl: <input type="text" id="openssl-priv-key-handle" onkeyup="copyval(this);"/><br>
 <br></p>
-<ul>
-<li><strong>1.6.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</li>
+</li>
+<li>
+<p><strong>1.6.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</p>
+</li>
 <li>
 <p><strong>1.7.</strong> Entre en el agente de administración del cluster con el comando:</p>
 <p>./cloudhsm_mgmt_util.sh</p>
@@ -183,18 +185,21 @@
 <li><strong>2.19.</strong> Haga click en <strong>Actions</strong>, seleccione <strong>Networking</strong> y haga click en <strong>Change Security Groups</strong></li>
 <li><strong>2.20.</strong> Deje seleccionado el Security Group <strong>webserver1-sg</strong> y seleccione también el grupo **cloudhsm-cluster-&lt;cluster id&gt;-sg</li>
 <li><strong>2.21.</strong> Haga click en <strong>Assign Security Groups</strong></li>
-<li><strong>2.22.</strong> Tome nota de la dirección IP publica en <strong>IPv4 Public IP</strong></li>
-</ul>
-<p>Entre <strong>IP Address</strong>: <input type="text" id="instance-ip" onkeyup="copyval(this);"/><br>
+<li>
+<p><strong>2.22.</strong> Tome nota de la dirección IP publica en <strong>IPv4 Public IP</strong></p>
+<p>Entre el <strong>IP Address</strong>: <input type="text" id="instance-ip" onkeyup="copyval(this);"/><br>
 <br>
 </details></p>
+</li>
+</ul>
 <h3 id="3-haga-la-configuracion-del-webserver1">3. Haga la configuración del webserver1</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
-<p>Entre el <strong>user id</strong> o valor aleatorio usado anteriormente: <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
-Entre <strong>HSM IP Address</strong>: <input type="text" id="cloudhsm-ip" onkeyup="copyval(this);"/><br>
-<br></p>
+<pre><code>Entre el **user id** o valor aleatorio usado anteriormente: &lt;input type="text" id="user-id" onkeyup="copyval(this);"/&gt;&lt;br&gt;
+Entre el **HSM IP Address**: &lt;input type="text" id="cloudhsm-ip" onkeyup="copyval(this);"/&gt;&lt;br&gt;
+</code></pre>
+<p><br></p>
 <ul>
 <li><strong>3.1.</strong> Vuelva a pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a></li>
 <li><strong>3.2.</strong> Haga click en <strong>Start session</strong></li>
