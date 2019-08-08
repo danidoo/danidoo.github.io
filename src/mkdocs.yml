@@ -1,12 +1,1 @@
-site_name: CloudHSM Workshop
-extra_javascript:
-  - 'javascripts/input_copy.js'
-theme:
-  name: 'mkdocs'
-nav:
-    - Inicio: index.md
-    - Ambiente de redes: networking_setup.md
-    - Inicialización: cluster_init.md
-    - Gestión de llaves: key_management.md
-    - Website: website.md
-    - ACM: acm.md
+../cloudhsm-workshop/mkdocs.yml
