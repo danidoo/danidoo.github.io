@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>WAF Automations Workshop</title>
+        <link href="css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="css/font-awesome.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="js/jquery-1.10.2.min.js" defer></script>
+        <script src="js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body class="homepage">
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <a class="navbar-brand" href=".">WAF Automations Workshop</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#analisando-e-bloqueando-vunerabilidades-em-aplicacoes-web-com-o-aws-waf">Analisando e bloqueando vunerabilidades em aplicações web com o AWS WAF</a></li>
+            <li><a href="#1-colete-os-dados-da-criacao-do-cloudformation">1. Colete os dados da criação do CloudFormation</a></li>
+            <li><a href="#2-criando-o-elastic-load-para-sua-aplicacao">2. Criando o Elastic Load para sua aplicação</a></li>
+            <li><a href="#3-conecte-a-instancia-com-windows-server-e-acesse-o-safesite">3. Conecte a instancia com windows server e acesse o SafeSite</a></li>
+            <li><a href="#4-explorando-as-vunerabilidades-do-site">4. Explorando as vunerabilidades do Site</a></li>
+        <li class="main "><a href="#41-sql-injection">4.1. SQL Injection</a></li>
+        <li class="main "><a href="#42-cross-site-scripting">4.2. Cross-site scripting</a></li>
+            <li><a href="#5-conectando-nossa-solucao-do-aws-waf-para-mitigar-os-ataques">5. Conectando nossa solução do AWS WAF para mitigar os ataques</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="analisando-e-bloqueando-vunerabilidades-em-aplicacoes-web-com-o-aws-waf">Analisando e bloqueando vunerabilidades em aplicações web com o AWS WAF</h2>
+<h3 id="1-colete-os-dados-da-criacao-do-cloudformation">1. Colete os dados da criação do CloudFormation</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>1.1.</strong> Abra no seu navegador uma pagina do <a href="https://console.aws.amazon.com/cloudformation/home">AWS CloudFormation</a> no seu console da AWS</li>
+<li><strong>1.2.</strong> Clique em <strong>outputs</strong> na aba do CloudFormation</li>
+<li><strong>1.3.</strong> copie o campo "value" da instancia SecLabServer e cole aqui: <input type="text" id="url-server" onkeyup="copyval(this);"/><br>
+<br></li>
+<li><strong>1.4.</strong> copie o campo "value" da instancia SecLabClient e cole aqui: <input type="text" id="url-client" onkeyup="copyval(this);"/><br>
+<br>
+</details></li>
+</ul>
+<h3 id="2-criando-o-elastic-load-para-sua-aplicacao">2. Criando o Elastic Load para sua aplicação</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>2.1.</strong> Vá até a pagina do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> no console da AWS</li>
+<li><strong>2.2.</strong> Clique em <strong>LoadBalancer</strong></li>
+<li><strong>2.3.</strong> Selecione <strong>Create</strong> em aplication Load Balancer</li>
+<li><strong>2.4.</strong> Coloque o nome que você quer que o Load Balancer tenha, por motivos didaticos vamos chama-lo de SafeSiteALB</li>
+<li><strong>2.5.</strong> em <strong>Listeners</strong> mantenha o HTTP, mas vamos subtituir a porta 80 por pela porta 8000, porta usada pela nossa aplicação</li>
+<li><strong>2.6.</strong> Na area <strong>Availability Zones</strong>, selecione as duas subnets disponiveis. Depois clique em <strong>Configure Security Groups</strong></li>
+<li><strong>2.7.</strong> Selecione um security group existente, clique no com nome de <strong>SecLabSG</strong>, este foi criado pelo nosso CloudFormation e é onde está nossas instancias</li>
+<li><strong>2.8.</strong> Clique em <strong>Next: Configure Routing</strong> </li>
+<li><strong>2.9.</strong> Nos Target Groups, selecione <strong>New target group</strong> </li>
+<li><strong>2.10.</strong> Vamos nomea-lo como, <strong>safeSiteTG</strong></li>
+<li><strong>2.11.</strong> Manteremos o Target Type como <strong>instance</strong>, materemos igual o protocolo como HTTP. Altere a porta de <strong>80</strong> para <strong>8000</strong> </li>
+<li><strong>2.12.</strong> Vamos registrar as nossas instancias, selecione a instencia <strong>SecLabServer</strong> e em seguida clique me <strong>Add to Registered</strong></li>
+<li><strong>2.13.</strong> Clique em <strong>next: Review</strong> </li>
+<li><strong>2.14.</strong> Verifique se todos os dados estão corretos, feito isso clique em <strong>Create</strong></li>
+<li><strong>2.15.</strong> Enquanto você aguarda a criação do seu ALB, copie o campo <strong>DNS name</strong> do ALB que acabamos de criar e cole aqui, usaremos mais tarde: <input type="text" id="url-ALB" onkeyup="copyval(this);"/><br>
+</details></li>
+</ul>
+<h3 id="3-conecte-a-instancia-com-windows-server-e-acesse-o-safesite">3. Conecte a instancia com windows server e acesse o SafeSite</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>3.1.</strong> Vá até a pagina do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> no console da AWS</li>
+<li><strong>3.2.</strong> Clique em <strong>Runniong Instances</strong></li>
+<li><strong>3.3.</strong> Selecione a instancia <strong>SecLabClient</strong> </li>
+<li><strong>3.4.</strong> Na aba superior, clique no botão <strong>connect</strong></li>
+<li><strong>3.5.</strong> Clique em <strong>Download Remote desktop File</strong></li>
+<li><strong>3.6.</strong> Após o download, clique no arquivo que agora está salvo no seu computador</li>
+<li><strong>3.7.</strong> Será pedido a senha da instancia com Windows, esta é: <strong>mBp4t;Jvg6!dskzt3DCHa@w7H?l5.?VE</strong></li>
+<li><strong>3.8.</strong> Aguarde a conexão e o carregamento da interface gráfica</li>
+<li><strong>3.9.</strong> Abra o navegador <strong>Firefox</strong></li>
+<li><strong>3.10.</strong> Cole no navegador o <span class="url-ALB">&lt;su_user_id&gt;</span>:8000<br>
+<br>
+</details></li>
+</ul>
+<h3 id="4-explorando-as-vunerabilidades-do-site">4. Explorando as vunerabilidades do Site</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<h2 id="41-sql-injection">4.1. SQL Injection</h2>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>4.1.1.</strong> Agora com você conectado ao nosso SafeSite, vamos começar a ver as possibilidades de exploração</li>
+<li><strong>4.1.2.</strong> Vamos começar pela página inicial, veremos SQL injection</li>
+<li><strong>4.1.3.</strong> No campo de <strong>Buscar posts</strong> digite algo que você deseja que seja procurado, a ideia é ver que a pesquisa está funcionando, por exemplo digite <strong>fox</strong></li>
+<li><strong>4.1.4.</strong> Agora vamos tentar fazer um sql injection, coloque na barra de pesquisa o seqguinte comando <strong>"or 1=1 --</strong>, e veja o que acontece</li>
+<li><strong>4.1.5.</strong> perceba que agora com o comando SQl Injection, o resultado se transforma em tudo que existe no banco de dados</li>
+</ul>
+</details>
+
+<h2 id="42-cross-site-scripting">4.2. Cross-site scripting</h2>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>4.2.1.</strong> Vamos para o proximo ataque que pode ser feito, vamos mudar para a pagina de contato</li>
+<li><strong>4.2.2.</strong> Aqui já sabemos que essa sessão do site aceita Cross-site scripiting, então vamos na sessão <strong>Livro de recados</strong></li>
+<li><strong>4.2.3.</strong> No quadro de <strong>Seu recado</strong> escreva um script em JavaScript para o cross-site scripting</li>
+<li><strong>4.2.4.</strong> Por efeito de demo, vamos deixar um exemplo simples, <strong><script>window.alert("Cross-site scripting funciona")</script></strong></li>
+<li><strong>4.2.5.</strong> Agora clique em enviar, o site vai pedir para que você faça login. Como usuário use <strong>guest</strong>, e como senha use <strong>guest</strong></li>
+<li><strong>4.2.6.</strong> Volte para a pagina de <strong>contato</strong> e refaça os passos a cima</li>
+<li><strong>4.2.7.</strong> Você vai ver que na area de mensagens, o seu cross-site scripting foi como comentario para a página, com sucesso</li>
+</ul>
+</details>
+
+</details>
+
+<h3 id="5-conectando-nossa-solucao-do-aws-waf-para-mitigar-os-ataques">5. Conectando nossa solução do AWS WAF para mitigar os ataques</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>5.1.</strong> Vamos voltar para o console da AWS, vamos para o <a href="https://console.aws.amazon.com/wafv2/home#/wafhome">AWS WAF</a></li>
+<li><strong>5.2.</strong> Selecione a região de <strong>São Paulo</strong></li>
+<li><strong>5.3.</strong> Você verá a area com as suas WebACLs para serem adicionadas ao seu Load Balancer</li>
+<li><strong>5.4.</strong> Clique em <strong>AWSWAFSecurityAutomations</strong>, quando a pagina estiver carregada clique em <strong>Rules</strong></li>
+<li><strong>5.5.</strong> Na parte de baixo da pagina, clique em <strong>Add Association</strong></li>
+<li><strong>5.6.</strong> Em <strong>Resource Type</strong>, selecione Elastic Load Balancer. É o que estamos usando no momento para esse lab </li>
+<li><strong>5.7.</strong> Em <strong>Resource</strong>, selecione o <strong>SafeSiteALB</strong>. Depois clique em <strong>Add</strong></li>
+<li><strong>5.8.</strong> Pronto, agora as regras do WAF estão associadas ao nosso site !</li>
+<li><strong>5.9.</strong> Agora volte ao site e refaça os ataques, dos passos <strong>4.1</strong> e <strong>4.2</strong>. Com o AWS WAF associado ao nosso balanceador de carga, este irá bloquear os ataques antes de chegar as nossas instancias</li>
+</ul>
+</details></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js" defer></script>
+        <script src="javascripts/input_copy.js" defer></script>
+        <script src="search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.0.4
+Build Date UTC : 2019-08-19 17:10:38
+-->
