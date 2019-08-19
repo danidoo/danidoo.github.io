@@ -143,7 +143,12 @@
 <li><strong>4.2.1.</strong> Vamos para o proximo ataque que pode ser feito, vamos mudar para a pagina de contato</li>
 <li><strong>4.2.2.</strong> Aqui já sabemos que essa sessão do site aceita Cross-site scripiting, então vamos na sessão <strong>Livro de recados</strong></li>
 <li><strong>4.2.3.</strong> No quadro de <strong>Seu recado</strong> escreva um script em JavaScript para o cross-site scripting</li>
-<li><strong>4.2.4.</strong> Por efeito de demo, vamos deixar um exemplo simples, <strong><script>window.alert("Cross-site scripting funciona")</script></strong></li>
+<li><strong>4.2.4.</strong> Por efeito de demo, vamos deixar um exemplo simples:</li>
+</ul>
+<pre><code>&lt;script&gt;window.alert(&quot;Cross-site scripting funciona&quot;)&lt;/script&gt;
+</code></pre>
+
+<ul>
 <li><strong>4.2.5.</strong> Agora clique em enviar, o site vai pedir para que você faça login. Como usuário use <strong>guest</strong>, e como senha use <strong>guest</strong></li>
 <li><strong>4.2.6.</strong> Volte para a pagina de <strong>contato</strong> e refaça os passos a cima</li>
 <li><strong>4.2.7.</strong> Você vai ver que na area de mensagens, o seu cross-site scripting foi como comentario para a página, com sucesso</li>
@@ -251,5 +256,5 @@
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-08-19 17:10:38
+Build Date UTC : 2019-08-19 17:19:54
 -->
