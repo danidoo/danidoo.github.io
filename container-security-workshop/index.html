@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Container Sec Workshop</title>
+        <link href="css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="css/font-awesome.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="js/jquery-1.10.2.min.js" defer></script>
+        <script src="js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body class="homepage">
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <a class="navbar-brand" href=".">Container Sec Workshop</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#analisando-imagens-de-containers-de-forma-automatizada-com-o-clair">Analisando imagens de containers de forma automatizada com o Clair</a></li>
+            <li><a href="#1-crie-uma-instancia-ec2">1. Crie uma instância EC2</a></li>
+            <li><a href="#2-conectando-a-instancia-que-voce-acabou-de-criar">2. Conectando a instância que você acabou de criar</a></li>
+            <li><a href="#3-configure-o-aws-cli-na-sua-instancia">3. Configure o AWS CLI na sua instância</a></li>
+            <li><a href="#4-construindo-o-ambiente-com-o-aws-cloudformation">4. Construindo o ambiente com o AWS CloudFormation</a></li>
+            <li><a href="#5-construindo-a-imagem-docker-do-clair">5. Construindo a imagem Docker do Clair:</a></li>
+            <li><a href="#6-fazendo-o-deploy-do-clair-usando-o-aws-cloudformation">6. Fazendo o deploy do Clair usando o AWS CloudFormation:</a></li>
+            <li><a href="#7-fazendo-o-deploy-do-site-de-exemplo-com-o-nginx">7. Fazendo o deploy do site de exemplo com o NGINX:</a></li>
+            <li><a href="#8-criando-o-pipeline">8. Criando o pipeline</a></li>
+            <li><a href="#9-verificando-os-resultados-no-cloudwatch-logs">9. Verificando os resultados no CloudWatch Logs</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="analisando-imagens-de-containers-de-forma-automatizada-com-o-clair">Analisando imagens de containers de forma automatizada com o Clair</h2>
+<h3 id="1-crie-uma-instancia-ec2">1. Crie uma instância EC2</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>1.1.</strong> Entre na página do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> no console da AWS</li>
+<li><strong>1.2.</strong> Clique em <strong>Launch Instance</strong></li>
+<li><strong>1.3.</strong> Na barra de pesquisa, procure por <strong>BlackBelt image Clair</strong></li>
+<li><strong>1.4.</strong> Selecione <strong>BlackBelt image Clair</strong></li>
+<li><strong>1.5.</strong> Na aba seguinte selecione o botão <strong>Review and Launch</strong></li>
+<li><strong>1.6.</strong> Revise os dados da instância e clique em <strong>Launch</strong></li>
+<li><strong>1.7.</strong> Nesta parte você verá que para finalizar a criação da instância, é necessário criar ou selecionar uma chave de acesso.<ul>
+<li><strong>1.7.1.</strong> Caso você já possua uma chave a qual tenha acesso, selecione-a para esta etapa.</li>
+<li><strong>1.7.2.</strong> Caso não tenha, selecione <strong>Create a new key pair</strong>, dê um nome para a chave e baixe-a no seu computador.</li>
+</ul>
+</li>
+<li><strong>1.8.</strong>  Selecione <strong>Launch Instances</strong></li>
+<li><strong>1.9.</strong> Aguarde a criação da instância</li>
+<li><strong>1.3.</strong> Após a criação da instância, copie o campo "Public DNS (IPV4)" da instância que você acabou de criar e cole aqui: <input type="text" id="url-instância" onkeyup="copyval(this);"/><br>
+<br>
+</details></li>
+</ul>
+<h3 id="2-conectando-a-instancia-que-voce-acabou-de-criar">2. Conectando a instância que você acabou de criar</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>2.1.</strong> Vá até a pagina do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> no console da AWS</li>
+<li><strong>2.2.</strong> Selecione a instância criada e clique no botão <strong>Connect</strong></li>
+<li><strong>2.3.</strong> Copie o exemplo de conexão que aparece na sua tela e cole aqui: <input type="text" id="url-acesso-instância" onkeyup="copyval(this);"/><br></li>
+<li><strong>2.4.</strong> Abra o seu terminal na pasta onde a chave de acesso está</li>
+<li><strong>2.5.</strong> Cole e rode o seguinte comando no seu terminal:
+<span class="url-acesso-instância">&lt;ssh_connect&gt;</span>
+</details></li>
+</ul>
+<h3 id="3-configure-o-aws-cli-na-sua-instancia">3. Configure o AWS CLI na sua instância</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>3.1.</strong> Com você logado na instância, rode o comando <code>sudo yum update</code></li>
+<li><strong>3.2.</strong> Aguarde a instalação dos pacotes mais atuais da AWS</li>
+<li><strong>3.3.</strong> Vamos configurar as credenciais de acesso do AWS CLI. Para isso vamos acessar o <a href="https://console.aws.amazon.com/iam/home">IAM</a> no console da AWS</li>
+<li><strong>3.4.</strong> Clique em <strong>Users</strong> e selecione um dos seus usuários</li>
+<li><strong>3.5.</strong> Clique em <strong>Security Credentials</strong></li>
+<li><strong>3.6.</strong> Clique em <strong>Create access key</strong></li>
+<li><strong>3.7.</strong> No <strong>Secret access key</strong> clique em <strong>show</strong></li>
+<li><strong>3.8.</strong> Copie o <strong>Access key ID</strong> e cole aqui: <input type="text" id="Access-key" onkeyup="copyval(this);"/><br></li>
+<li><strong>3.9.</strong> Copie o <strong>Secret access key</strong> e cole aqui: <input type="text" id="secret-key" onkeyup="copyval(this);"/><br></li>
+<li><strong>3.10.</strong> Volte para o terminal e rode <code>aws config</code></li>
+<li><strong>3.11.</strong> A primeira coisa que o <code>aws config</code> vai pedir é o <strong>AWS Access key ID</strong>: <span class="Access-key">&lt;key_id&gt;</span><br></li>
+<li><strong>3.12.</strong> Depois será a vez do <strong>AWS Secret Access Key</strong>, cole ele no seu terminal: <span class="secret-key">&lt;key&gt;</span><br></li>
+<li><strong>3.13.</strong> Agora é a vez de selecionar a região da AWS que seus serviços serão lançados. Para esta demo, escreva <code>us-east-1</code></li>
+<li><strong>3.14.</strong> No <strong>Default output format</strong> deixe vazio, somente pressione a tecla <strong>enter</strong></li>
+<li><strong>3.15.</strong> Agora temos o AWS CLI configurado com sucesso
+<br>
+</details></li>
+</ul>
+<h3 id="4-construindo-o-ambiente-com-o-aws-cloudformation">4. Construindo o ambiente com o AWS CloudFormation</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>4.1.</strong> Vamos copiar os templates do CloudFormation do GitHub, para isso cole no seu terminal:</p>
+<p><code>git clone https://github.com/aws-samples/aws-codepipeline-docker-vulnerability-scan.git</code><br>
+<code>cd aws-codepipeline-docker-vulnerability-scan</code></p>
+</li>
+<li>
+<p><strong>4.2.</strong> O primeiro CloudFormation que vamos rodar será o de construção do ambiente de redes, como VPCs e subnets. Para isso cole no seu terminal:</p>
+<p><code>aws cloudformation create-stack \</code><br>
+<code>--stack-name coreos-clair-vpc-stack \</code><br>
+<code>--template-body file://networking-template.yaml</code><br></p>
+</li>
+<li>
+<p><strong>4.3.</strong> Verifique como está o estágio de criação do sua primeira stack no CloudFormation com o comando abaixo:</p>
+<p><code>aws cloudformation wait stack-create-complete \</code><br>
+<code>--stack-name coreos-clair-vpc-stack</code></p>
+</li>
+<li>
+<p><strong>4.4.</strong> Após receber o status de conclusão do CloudFormation, vamos obter o output da stack:</p>
+<p><code>aws cloudformation describe-stacks \</code> <br>
+<code>--stack-name coreos-clair-vpc-stack</code></p>
+</li>
+<li>
+<p><strong>4.5.</strong> Pegue os dados do output e salve aqui<br>
+    VPC: <input type="text" id="vpc-id" onkeyup="copyval(this);"/><br>
+    Public-subnet 1: <input type="text" id="pub-sub-1" onkeyup="copyval(this);"/><br>
+    Public-subnet 2: <input type="text" id="pub-sub-2" onkeyup="copyval(this);"/><br>
+    Private-subnet 1: <input type="text" id="priv-sub-1" onkeyup="copyval(this);"/><br>
+    Private-subnet 2: <input type="text" id="priv-sub-2" onkeyup="copyval(this);"/><br>
+    Cloud9-environment-name: <input type="text" id="cloud9-env" onkeyup="copyval(this);"/><br>
+<br>
+</details></p>
+</li>
+</ul>
+<h3 id="5-construindo-a-imagem-docker-do-clair">5. Construindo a imagem Docker do Clair:</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>5.1.</strong> A primeira coisa que vamos fazer é criar um repositório do ECR. Para isso, cole no seu terminal o comando abaixo:</p>
+<p><code>aws ecr create-repository --repository-name coreos-clair</code></p>
+</li>
+<li>
+<p><strong>5.2.</strong> A execução do comando irá gerar um output no terminal. Anote os seguintes dados:<br>
+    ID: <input type="text" id="userID" onkeyup="copyval(this);"/> (<code>registryID</code>), este é o ID de sua conta AWS)<br>
+    URI:<input type="text" id="ecr-uri" onkeyup="copyval(this);"/> (<code>repositoryUri</code>)<br>
+    ARN:<input type="text" id="ecr-arn" onkeyup="copyval(this);"/> (<code>repositoryArn</code>)<br></p>
+</li>
+<li>
+<p><strong>5.3.</strong>  Em seguida, construa a imagem do Docker com o comando:</p>
+<p><code>docker build -t</code> <span class="ecr-uri">&lt;ecr-uri&gt;</span><code>:latest ./coreos-clair</code></p>
+</li>
+<li>
+<p><strong>5.4.</strong> Por fim, faça o <em>push</em> da imagem para o repositório criado no ECR:</p>
+<p><code>aws ecr get-login --no-include-email | bash</code></p>
+<p><code>docker push</code> <span class="ecr-uri">&lt;ecr-uri&gt;</span><code>:latest</code></p>
+</li>
+</ul>
+</details>
+
+<h3 id="6-fazendo-o-deploy-do-clair-usando-o-aws-cloudformation">6. Fazendo o deploy do Clair usando o AWS CloudFormation:</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>6.1.</strong> Vamos executar outro CloudFormation para fazer o deploy do Clair, execute o seguinte comando no <strong>terminal</strong>:</p>
+<p><code>aws cloudformation create-stack \</code><br>
+<code>--stack-name coreos-clair-stack \</code><br>
+<code>--template-body file://coreos-clair/clair-template.yaml \</code><br>
+<code>--capabilities CAPABILITY_IAM \</code><br>
+<code>--parameters \</code><br>
+<code>ParameterKey=VpcId,ParameterValue=</code><span class="vpc-id">&lt;vpc_id&gt;</span><code>\</code><br>
+<code>ParameterKey=PublicSubnets,ParameterValue=</code><span class="pub-sub-1">&lt;pub_sub_1&gt;</span><code>\\,</code><span class="pub-sub-2">&lt;su_user_id&gt;</span> <code>\</code><br>
+<code>ParameterKey=PrivateSubnets,ParameterValue=</code><span class="priv-sub-1">&lt;priv_sub_1&gt;</span><code>\\,</code><span class="priv-sub-2">&lt;su_user_id&gt;</span> <code>\</code><br>
+<code>ParameterKey=ECRRepositoryUri,ParameterValue=</code><span class="ecr-uri">&lt;ecr_uri&gt;</span></p>
+</li>
+<li>
+<p><strong>6.2.</strong> verifique a criação do CloudFormation com o <strong>comando</strong> abaixo:</p>
+<p><code>aws cloudformation wait stack-create-complete \</code><br>
+<code>--stack-name coreos-clair-stack</code>
+<br></p>
+</li>
+</ul>
+<h3 id="7-fazendo-o-deploy-do-site-de-exemplo-com-o-nginx">7. Fazendo o deploy do site de exemplo com o NGINX:</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>7.1.</strong> Vamos criar um repositório do CodeCommit para armazenar o website com NGINX, para isso cole os comandos a baixo no seu <strong>terminal</strong>:
+<br></p>
+<ul>
+<li>
+<p><strong>7.1.1.</strong> Crie o repositório:<br></p>
+<p><code>aws codecommit create-repository --repository-name my-nginx-website</code><br>
+<code>cd ../</code><br>
+<code>git clone &lt;cloneUrlSsh&gt;</code>
+<br></p>
+</li>
+<li>
+<p><strong>7.1.2.</strong> Copie o site NGINX do repósitório:<br></p>
+<p><code>cp -R aws-codepipeline-docker-vulnerability-scan/nginx-website/* my-nginx-website/</code><br></p>
+</li>
+<li>
+<p><strong>7.1.3.</strong> Faça os comentarios da sua alteração, e envie-lo:</p>
+<p><code>cd my-nginx-wecd mybsite/</code><br>
+<code>git add *</code><br>
+<code>git commit -m "Initial commit"</code><br>
+<code>git push</code><br></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>7.2.</strong> Agora, criaremos um repositório para hospedar a imagem do site NGINX:
+<br></p>
+<ul>
+<li>
+<p><strong>7.2.1.</strong> Crie o repositório:<br></p>
+<p><code>aws ecr create-repository --repository-name nginx-website</code>
+<br></p>
+</li>
+<li>
+<p><strong>7.2.2.</strong> Construindo a imagem do docker<br></p>
+<p><code>docker build -f Dockerfile-amznlinux -t</code><span class="ecr-uri">&lt;ecr_uri&gt;</span><code>/nginx-website:latest .</code><br></p>
+</li>
+<li>
+<p><strong>7.2.3.</strong> Envie a imagem do docker para o repositório:<br></p>
+<p><code>docker push</code><span class="ecr-uri">&lt;ecr_uri&gt;</span><code>/nginx-website:latest</code><br></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>7.3.</strong> Então, vamos fazer o deploy do site NGINX usando o <strong>AWS CloudFormation</strong>. Coloque no seu terminal os comandos a seguir:<br></p>
+<ul>
+<li>
+<p><strong>7.3.1.</strong> Volte uma pasta na sua instancia:<br></p>
+<p><code>cd ../aws-codepipeline-docker-vulnerability-scan/</code>
+<br></p>
+</li>
+<li>
+<p><strong>7.3.2.</strong> Cole no seu terminal todas as linhas abaixo, para a criação dos recursos via <strong>CloudFormation</strong>:<br></p>
+<p><code>aws cloudformation create-stack \</code><br>
+<code>--stack-name nginx-website-stack \</code><br>
+<code>--stack-name coreos-clair-stack \</code><br>
+<code>--template-body file://nginx-website/nginx-website-template.yaml \</code><br>
+<code>--capabilities CAPABILITY_IAM \</code><br>
+<code>--parameters \</code><br>
+<code>ParameterKey=VpcId,ParameterValue=</code><span class="vpc-id">&lt;vpc_id&gt;</span><code>\</code><br>
+<code>ParameterKey=PublicSubnets,ParameterValue=</code><span class="pub-sub-1">&lt;pub_sub_1&gt;</span><code>\\,</code><span class="pub-sub-2">&lt;su_user_id&gt;</span><code>\</code><br>
+<code>ParameterKey=PrivateSubnets,ParameterValue=</code><span class="priv-sub-1">&lt;priv_sub_1&gt;</span><code>\\,</code><span class="priv-sub-2">&lt;su_user_id&gt;</span><code>\</code><br>
+<code>ParameterKey=ECRRepositoryUri,ParameterValue=</code><span class="ecr-uri">&lt;ecr_uri&gt;</span>
+<br></p>
+</li>
+<li>
+<p><strong>7.3.3.</strong> Verifique se a construção do <strong>CloudFormation</strong> foi feita com sucesso, com o comando abaixo:<br></p>
+<p><code>aws cloudformation wait stack-create-complete \</code><br>
+<code>--stack-name nginx-website-stack</code>
+<br></p>
+</li>
+<li>
+<p><strong>7.3.4.</strong> Pegue os outputs do <strong>CloudFormation</strong> que acabamos de criar colocando os seguintes comandos no seu terminal:</p>
+<p><code>aws cloudformation describe-stacks \</code><br>
+<code>--stack-name nginx-website-stack \</code><br>
+<code>--query 'Stacks[].Outputs[]'</code>
+<br></p>
+</li>
+<li>
+<p><strong>7.3.5.</strong> Cole aqui os dois outputs do <strong>CloudFormation</strong> que acabamos de criar:
+A url do seu <strong>loadbalancer</strong>:  <input type="text" id="url-nginx" onkeyup="copyval(this);"/>
+O nome do seu service do <strong>ECS</strong>: <input type="text" id="ecs-name" onkeyup="copyval(this);"/></p>
+</li>
+</ul>
+</li>
+</ul>
+<p><br></p>
+</details>
+
+<h3 id="8-criando-o-pipeline">8. Criando o pipeline</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>8.1.</strong> Vamos Criar um CloudFormation para criar o pipeline com o Clair. O template a seguir cria um projeto no CodBuild, um pipeline no ColdPipeline, ua regra no Amazon CloudWatch Events e as permissões necessárias pelo IAM.</li>
+<li>
+<p><strong>8.2.</strong> Cole no seu <strong>terminal</strong> os comandos abaixo para a criação da stack no CloudFormation</p>
+<p><code>aws cloudformation create-stack \</code><br>
+<code>--stack-name nginx-website-codepipeline-stack \</code><br>
+<code>--template-body file://clair-codepipeline-template.yaml \</code><br>
+<code>--capabilities CAPABILITY_IAM \</code><br>
+<code>--disable-rollback \</code><br>
+<code>--parameters \</code><br>
+<code>ParameterKey=EcrRepositoryArn,ParameterValue=</code><span class="ecr-arn">&lt;ecr_arn&gt;</span><code>/nginx-website \</code><br>
+<code>ParameterKey=EcrRepositoryUri,ParameterValue=</code><span class="ecr-uri">&lt;ecr_uri&gt;</span><code>/nginx-website \</code><br>
+<code>ParameterKey=ClairAlbDnsName,ParameterValue=</code><span class="url-nginx">&lt;nginx_url&gt;</span><code>\</code><br>
+<code>ParameterKey=EcsServiceName,ParameterValue=</code><span class="ecs-name">&lt;ecs_name&gt;</span><code>\</code><br>
+<code>ParameterKey=NginxWebsiteCodeCommitRepoArn,ParameterValue=</code><span class="">&lt;codecommit_repo_arn&gt;</span></p>
+</li>
+</ul>
+</details>
+
+<h3 id="9-verificando-os-resultados-no-cloudwatch-logs">9. Verificando os resultados no CloudWatch Logs</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>9.1.</strong> Acesse o <a href="https://console.aws.amazon.com/cloudwatch/home">CloudWatch Logs</a> no console da AWS</li>
+<li><strong>9.2.</strong> Entre na sessão de <strong>Logs</strong>, no menu a esquerda</li>
+<li><strong>9.3.</strong> Selecione o <em>/aws/codebuild/nginx-codeBuild-project</em>, para que você possa fazer a analise</li>
+<li><strong>9.4.</strong> Lá fica salvo todos os logs dentro das pastas, lá se pode verificar todas as vunerabilidades que foram encontradas pelo Clair.</li>
+</ul>
+</details></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js" defer></script>
+        <script src="javascripts/input_copy.js" defer></script>
+        <script src="search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.0.4
+Build Date UTC : 2019-08-26 19:20:43
+-->
