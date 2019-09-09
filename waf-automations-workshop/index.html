@@ -53,68 +53,71 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#analisando-e-bloqueando-vunerabilidades-em-aplicacoes-web-com-o-aws-waf">Analisando e bloqueando vunerabilidades em aplicações web com o AWS WAF</a></li>
-            <li><a href="#1-colete-os-dados-da-criacao-do-cloudformation">1. Colete os dados da criação do CloudFormation</a></li>
-            <li><a href="#2-criando-o-elastic-load-para-sua-aplicacao">2. Criando o Elastic Load para sua aplicação</a></li>
-            <li><a href="#3-conecte-a-instancia-com-windows-server-e-acesse-o-safesite">3. Conecte a instancia com windows server e acesse o SafeSite</a></li>
+            <li><a href="#1-verifique-os-recursos-criados-pelo-stack-de-cloudformation">1. Verifique os recursos criados pelo Stack de CloudFormation</a></li>
+            <li><a href="#2-criando-um-application-load-balancer-para-sua-aplicacao">2. Criando um Application Load Balancer para sua aplicação</a></li>
+            <li><a href="#3-conecte-a-instancia-windows-server-e-acesse-o-safesite">3. Conecte à instancia Windows Server e acesse o SafeSite</a></li>
             <li><a href="#4-explorando-as-vunerabilidades-do-site">4. Explorando as vunerabilidades do Site</a></li>
-        <li class="main "><a href="#41-sql-injection">4.1. SQL Injection</a></li>
-        <li class="main "><a href="#42-cross-site-scripting">4.2. Cross-site scripting</a></li>
-            <li><a href="#5-conectando-nossa-solucao-do-aws-waf-para-mitigar-os-ataques">5. Conectando nossa solução do AWS WAF para mitigar os ataques</a></li>
+            <li><a href="#41-sql-injection">4.1. SQL Injection</a></li>
+            <li><a href="#42-cross-site-scripting">4.2. Cross-site scripting</a></li>
+            <li><a href="#5-conectando-nossa-solucao-com-o-aws-waf-para-mitigar-os-ataques">5. Conectando nossa solução com o AWS WAF para mitigar os ataques</a></li>
+            <li><a href="#6-verificando-o-funcionamento-da-regra-bad-bot-do-aws-waf-security-automations">6. Verificando o funcionamento da regra Bad Bot do AWS WAF Security Automations</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
 <h2 id="analisando-e-bloqueando-vunerabilidades-em-aplicacoes-web-com-o-aws-waf">Analisando e bloqueando vunerabilidades em aplicações web com o AWS WAF</h2>
-<h3 id="1-colete-os-dados-da-criacao-do-cloudformation">1. Colete os dados da criação do CloudFormation</h3>
+<h3 id="1-verifique-os-recursos-criados-pelo-stack-de-cloudformation">1. Verifique os recursos criados pelo Stack de CloudFormation</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>1.1.</strong> Abra no seu navegador uma pagina do <a href="https://console.aws.amazon.com/cloudformation/home">AWS CloudFormation</a> no seu console da AWS</li>
-<li><strong>1.2.</strong> Clique em <strong>outputs</strong> na aba do CloudFormation</li>
-<li><strong>1.3.</strong> copie o campo "value" da instancia SecLabServer e cole aqui: <input type="text" id="url-server" onkeyup="copyval(this);"/><br>
-<br></li>
-<li><strong>1.4.</strong> copie o campo "value" da instancia SecLabClient e cole aqui: <input type="text" id="url-client" onkeyup="copyval(this);"/><br>
-<br>
+<li><strong>1.1.</strong> Abra a serviço <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> na console da AWS</li>
+<li><strong>1.2.</strong> Clique em <strong>Running Instances</strong></li>
+<li><strong>1.3.</strong> Verifique que há 2 servidores criados, um com nome <strong>SecLabServer</strong> e outro <strong>SecLabClient</strong> e que ambos estão no estado <strong>running</strong>
 </details></li>
 </ul>
-<h3 id="2-criando-o-elastic-load-para-sua-aplicacao">2. Criando o Elastic Load para sua aplicação</h3>
+<h3 id="2-criando-um-application-load-balancer-para-sua-aplicacao">2. Criando um Application Load Balancer para sua aplicação</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>2.1.</strong> Vá até a pagina do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> no console da AWS</li>
-<li><strong>2.2.</strong> Clique em <strong>LoadBalancer</strong></li>
-<li><strong>2.3.</strong> Selecione <strong>Create</strong> em aplication Load Balancer</li>
-<li><strong>2.4.</strong> Coloque o nome que você quer que o Load Balancer tenha, por motivos didaticos vamos chama-lo de SafeSiteALB</li>
-<li><strong>2.5.</strong> em <strong>Listeners</strong> mantenha o HTTP, mas vamos subtituir a porta 80 por pela porta 8000, porta usada pela nossa aplicação</li>
-<li><strong>2.6.</strong> Na area <strong>Availability Zones</strong>, selecione as duas subnets disponiveis. Depois clique em <strong>Configure Security Groups</strong></li>
-<li><strong>2.7.</strong> Selecione um security group existente, clique no com nome de <strong>SecLabSG</strong>, este foi criado pelo nosso CloudFormation e é onde está nossas instancias</li>
-<li><strong>2.8.</strong> Clique em <strong>Next: Configure Routing</strong> </li>
-<li><strong>2.9.</strong> Nos Target Groups, selecione <strong>New target group</strong> </li>
-<li><strong>2.10.</strong> Vamos nomea-lo como, <strong>safeSiteTG</strong></li>
-<li><strong>2.11.</strong> Manteremos o Target Type como <strong>instance</strong>, materemos igual o protocolo como HTTP. Altere a porta de <strong>80</strong> para <strong>8000</strong> </li>
-<li><strong>2.12.</strong> Vamos registrar as nossas instancias, selecione a instencia <strong>SecLabServer</strong> e em seguida clique me <strong>Add to Registered</strong></li>
-<li><strong>2.13.</strong> Clique em <strong>next: Review</strong> </li>
-<li><strong>2.14.</strong> Verifique se todos os dados estão corretos, feito isso clique em <strong>Create</strong></li>
-<li><strong>2.15.</strong> Enquanto você aguarda a criação do seu ALB, copie o campo <strong>DNS name</strong> do ALB que acabamos de criar e cole aqui, usaremos mais tarde: <input type="text" id="url-ALB" onkeyup="copyval(this);"/><br>
+<li><strong>2.1.</strong> Selecione <strong>LoadBalancer</strong> no menu lateral</li>
+<li><strong>2.2.</strong> Clique em <strong>Create Load Balancer</strong></li>
+<li><strong>2.3.</strong> Na caixa "Application Load Balancer" clique em <strong>Create</strong></li>
+<li><strong>2.4.</strong> No campo <strong>Name</strong> preencha com o nome do balanceador de carga, por exemplo <strong>SafeSiteALB</strong></li>
+<li><strong>2.5.</strong> Na seção <strong>Availability Zones</strong>, em <strong>VPC</strong> selecione o que tem a marcação <strong>(default)</strong> no final e selecione ao menos duas das subnets disponiveis</li>
+<li><strong>2.6.</strong> Clique em <strong>Next: Configure Security Settings</strong></li>
+<li><strong>2.7.</strong> Pode ignorar a mensagem "Improve your load balancer's security. Your load balancer is not using any secure listener.", clicando em <strong>Next: Configure Security Groups</strong></li>
+<li><strong>2.8.</strong> Escolha um security group existente, selecionando o que tem <strong>SecLabSG</strong> criado pelo CloudFormation, e de-selecione o "default"</li>
+<li><strong>2.9.</strong> Clique em <strong>Next: Configure Routing</strong></li>
+<li><strong>2.10.</strong> Em "Target Groups", deixe selecionado <strong>New target group</strong> </li>
+<li><strong>2.11.</strong> Vamos nomeá-lo como <strong>safeSiteTG</strong></li>
+<li><strong>2.12.</strong> Mantenha as outras configurações como estão, apenas altere a porta de <strong>80</strong> para <strong>8000</strong> </li>
+<li><strong>2.13.</strong> Clique em <strong>Next: Register Targets</strong></li>
+<li><strong>2.14.</strong> Registre a instancia da aplicação selecionando a linha do <strong>SecLabServer</strong> e clicando em <strong>Add to registered</strong></li>
+<li><strong>2.15.</strong> Clique em <strong>Next: Review</strong> </li>
+<li><strong>2.16.</strong> Verifique se todos os dados estão corretos, feito isso clique em <strong>Create</strong> e depois em <strong>Close</strong></li>
+<li><strong>2.17.</strong> Enquanto você aguarda a criação do seu ALB, copie o campo <strong>DNS name</strong> do ALB que acabamos de criar e cole abaixo para usar mais tarde<br>
+<input type="text" id="url-ALB" onkeyup="copyval(this);"/><br>
 </details></li>
 </ul>
-<h3 id="3-conecte-a-instancia-com-windows-server-e-acesse-o-safesite">3. Conecte a instancia com windows server e acesse o SafeSite</h3>
+<h3 id="3-conecte-a-instancia-windows-server-e-acesse-o-safesite">3. Conecte à instancia Windows Server e acesse o SafeSite</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>3.1.</strong> Vá até a pagina do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> no console da AWS</li>
-<li><strong>3.2.</strong> Clique em <strong>Runniong Instances</strong></li>
+<li><strong>3.1.</strong> Vá até a pagina do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> na console da AWS</li>
+<li><strong>3.2.</strong> Clique em <strong>Running Instances</strong></li>
 <li><strong>3.3.</strong> Selecione a instancia <strong>SecLabClient</strong> </li>
-<li><strong>3.4.</strong> Na aba superior, clique no botão <strong>connect</strong></li>
-<li><strong>3.5.</strong> Clique em <strong>Download Remote desktop File</strong></li>
+<li><strong>3.4.</strong> Na aba superior, clique no botão <strong>Connect</strong></li>
+<li><strong>3.5.</strong> Clique em <strong>Download Remote Desktop File</strong></li>
 <li><strong>3.6.</strong> Após o download, clique no arquivo que agora está salvo no seu computador</li>
 <li><strong>3.7.</strong> Será pedido a senha da instancia com Windows, esta é: <strong>mBp4t;Jvg6!dskzt3DCHa@w7H?l5.?VE</strong></li>
 <li><strong>3.8.</strong> Aguarde a conexão e o carregamento da interface gráfica</li>
-<li><strong>3.9.</strong> Abra o navegador <strong>Firefox</strong></li>
-<li><strong>3.10.</strong> Cole no navegador o <span class="url-ALB">&lt;su_user_id&gt;</span>:8000<br>
+<li><strong>3.9.</strong> Na janela "Shutdown Event Tracker" clique em <strong>Cancel</strong></li>
+<li><strong>3.10.</strong> Abra o navegador <strong>Firefox</strong> através do icone na Área de Trabalho</li>
+<li><strong>3.11.</strong> Cole no navegador a URL abaixo<br>
+http://<span class="url-ALB">&lt;safesite/&gt;</span><br>
 <br>
 </details></li>
 </ul>
@@ -122,57 +125,80 @@
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
-<h2 id="41-sql-injection">4.1. SQL Injection</h2>
+<h3 id="41-sql-injection">4.1. SQL Injection</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
 <li><strong>4.1.1.</strong> Agora com você conectado ao nosso SafeSite, vamos começar a ver as possibilidades de exploração</li>
-<li><strong>4.1.2.</strong> Vamos começar pela página inicial, veremos SQL injection</li>
+<li><strong>4.1.2.</strong> Vamos começar pela página inicial com um ataque de SQL Injection</li>
 <li><strong>4.1.3.</strong> No campo de <strong>Buscar posts</strong> digite algo que você deseja que seja procurado, a ideia é ver que a pesquisa está funcionando, por exemplo digite <strong>fox</strong></li>
-<li><strong>4.1.4.</strong> Agora vamos tentar fazer um sql injection, coloque na barra de pesquisa o seqguinte comando <strong>"or 1=1 --</strong>, e veja o que acontece</li>
-<li><strong>4.1.5.</strong> perceba que agora com o comando SQl Injection, o resultado se transforma em tudo que existe no banco de dados</li>
+<li><strong>4.1.4.</strong> Vamos tentar fazer um ataque de SQL Injection, na ferramenta de busca no site, faça uma busca usando o seguinte texto:
+'''
+" or 1=1 --
+'''</li>
+<li><strong>4.1.5.</strong> Perceba que o resultado mostra todos os posts que existem na tabela do banco de dados pois foi feito um ataque de SQL Injection</li>
+<li><strong>4.1.4.</strong> Agora vamos sofisticar o ataque, usando o seguinte comando na busca do site<br>
+'''
+X" union select login || ': ' || email, password from logins --
+'''</li>
+<li><strong>4.1.5.</strong> Veja que agora o resultado são os hashes de login de usuários, verifique que os hashes podem ser facilmente quebrados com ferramentas como https://crackstation.net/.</li>
 </ul>
 </details>
 
-<h2 id="42-cross-site-scripting">4.2. Cross-site scripting</h2>
+<h3 id="42-cross-site-scripting">4.2. Cross-site scripting</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>4.2.1.</strong> Vamos para o proximo ataque que pode ser feito, vamos mudar para a pagina de contato</li>
-<li><strong>4.2.2.</strong> Aqui já sabemos que essa sessão do site aceita Cross-site scripiting, então vamos na sessão <strong>Livro de recados</strong></li>
-<li><strong>4.2.3.</strong> No quadro de <strong>Seu recado</strong> escreva um script em JavaScript para o cross-site scripting</li>
-<li><strong>4.2.4.</strong> Por efeito de demo, vamos deixar um exemplo simples:</li>
+<li><strong>4.2.1.</strong> A página de <strong>Contato</strong> do site é vulnerável ao ataque de Cross-Site Scripting, mas primeiro temos que fazer login no site</li>
+<li><strong>4.2.2.</strong> Clique em <strong>Área Restrita</strong> e faça login como <strong>guest</strong> e senha <strong>guest</strong></li>
+<li><strong>4.2.3.</strong> Uma vez autenticado, clique no link <strong>Contato</strong></li>
+<li><strong>4.2.4.</strong> Na seção <strong>Livro de Recados</strong>, no campo <strong>Seu recado</strong> preencha com conteúdo em JavaScript para executar um ataque de cross-site scripting (XSS), como por exemplo:<br></li>
 </ul>
 <pre><code>&lt;script&gt;window.alert(&quot;Cross-site scripting funciona&quot;)&lt;/script&gt;
 </code></pre>
 
 <ul>
-<li><strong>4.2.5.</strong> Agora clique em enviar, o site vai pedir para que você faça login. Como usuário use <strong>guest</strong>, e como senha use <strong>guest</strong></li>
-<li><strong>4.2.6.</strong> Volte para a pagina de <strong>contato</strong> e refaça os passos a cima</li>
-<li><strong>4.2.7.</strong> Você vai ver que na area de mensagens, o seu cross-site scripting foi como comentario para a página, com sucesso</li>
+<li><strong>4.2.5.</strong> Clique em <strong>Escrever</strong> e quando a página for recarregada você deverá receber um alerta do navegador com a mensagem contida no script que foi enviado
+</details>
+</details></li>
 </ul>
-</details>
-
-</details>
-
-<h3 id="5-conectando-nossa-solucao-do-aws-waf-para-mitigar-os-ataques">5. Conectando nossa solução do AWS WAF para mitigar os ataques</h3>
+<h3 id="5-conectando-nossa-solucao-com-o-aws-waf-para-mitigar-os-ataques">5. Conectando nossa solução com o AWS WAF para mitigar os ataques</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>5.1.</strong> Vamos voltar para o console da AWS, vamos para o <a href="https://console.aws.amazon.com/wafv2/home#/wafhome">AWS WAF</a></li>
-<li><strong>5.2.</strong> Selecione a região de <strong>São Paulo</strong></li>
-<li><strong>5.3.</strong> Você verá a area com as suas WebACLs para serem adicionadas ao seu Load Balancer</li>
-<li><strong>5.4.</strong> Clique em <strong>AWSWAFSecurityAutomations</strong>, quando a pagina estiver carregada clique em <strong>Rules</strong></li>
-<li><strong>5.5.</strong> Na parte de baixo da pagina, clique em <strong>Add Association</strong></li>
-<li><strong>5.6.</strong> Em <strong>Resource Type</strong>, selecione Elastic Load Balancer. É o que estamos usando no momento para esse lab </li>
-<li><strong>5.7.</strong> Em <strong>Resource</strong>, selecione o <strong>SafeSiteALB</strong>. Depois clique em <strong>Add</strong></li>
-<li><strong>5.8.</strong> Pronto, agora as regras do WAF estão associadas ao nosso site !</li>
-<li><strong>5.9.</strong> Agora volte ao site e refaça os ataques, dos passos <strong>4.1</strong> e <strong>4.2</strong>. Com o AWS WAF associado ao nosso balanceador de carga, este irá bloquear os ataques antes de chegar as nossas instancias</li>
+<li><strong>5.1.</strong> Voltando à console da AWS, abra o serviço <a href="https://console.aws.amazon.com/wafv2/home#/wafhome">AWS WAF</a></li>
+<li><strong>5.2.</strong> Clique em <strong>Go to AWS WAF</strong> e depois em <strong>Web ACLs</strong> no menu lateral</li>
+<li><strong>5.3.</strong> Verifique que o parametro <strong>Filter</strong> está selecionado com <strong>US East (N. Virginia)</strong></li>
+<li><strong>5.4.</strong> Nesta página você verá as WebACLs disponíveis para proteção de seus Load Balancers</li>
+<li><strong>5.5.</strong> Clique em <strong>AWSWAFSecurityAutomations</strong>, e após o carregamento da página clique na aba <strong>Rules</strong></li>
+<li><strong>5.6.</strong> Na parte de baixo da pagina, clique em <strong>Add Association</strong></li>
+<li><strong>5.7.</strong> Em <strong>Resource Type</strong>, selecione <strong>Application Load Balancer</strong></li>
+<li><strong>5.8.</strong> Em <strong>Resource</strong>, selecione o <strong>SafeSiteALB</strong> e clique em <strong>Add</strong></li>
+<li><strong>5.9.</strong> A partir de agora as regras do AWS WAF estão associadas ao balanceador de carga e irão bloquear determinadas chamadas de acordo com as regras configuradas</li>
+<li><strong>5.10.</strong> Agora volte ao site e refaça os ataques dos passos <strong>4.1</strong> e <strong>4.2</strong>. Com o AWS WAF associado ao nosso balanceador de carga, os ataques serão bloqueados antes de chegar aos recursos configurados no "Target Group" (neste caso às instancias EC2)
+</details></li>
 </ul>
-</details></div>
+<h3 id="6-verificando-o-funcionamento-da-regra-bad-bot-do-aws-waf-security-automations">6. Verificando o funcionamento da regra Bad Bot do AWS WAF Security Automations</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>6.1.</strong> Volte novamente à console do serviço <a href="https://console.aws.amazon.com/wafv2/home#/wafhome">AWS WAF</a></li>
+<li><strong>6.2.</strong> Clique na regra <strong>AWSWAFSecurityAutomations - Bad Bot Rule</strong></li>
+<li><strong>6.3.</strong> Verifique que a lista de endereços associada a esta regra está vazia quando houver o seguinte texto na configuração: "No IP addresses are in this IP match condition."</li>
+<li><strong>6.4.</strong> Volte novamente à console do serviço <a href="https://console.aws.amazon.com/wafv2/home#/wafhome">AWS WAF</a></li>
+<li><strong>6.5.</strong> Abra em outra janela ou aba do navegador o serviço <a href="https://console.aws.amazon.com/cloudformation/home">AWS CloudFormation</a></li>
+<li><strong>6.6.</strong> Clique no Stack <strong>AWSWAFSecurityAutomations</strong> e depois selecione a aba <strong>Outputs</strong></li>
+<li><strong>6.7.</strong> Copie o link para o <strong>BadBotHoneypotEndpoint</strong> (uma URL similar a https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/ProdStage)</li>
+<li><strong>6.8.</strong> Voltando ao Remote Desktop no Windows Client, acesse no navegador a URL copiada anteriormente</li>
+<li><strong>6.9.</strong> Retorne à console AWS na janela ou aba com as configurações de regras do WAF e recarregue a página</li>
+<li><strong>6.10.</strong> Agora na lista de endereços IP deve haver um endereço IP associado à instancia Windows Client</li>
+<li><strong>6.11.</strong> Se esta regra fosse utilizada para um site publicado externamente, o cliente que acessar a URL seria bloqueado pelo WAF
+</details></li>
+</ul></div>
         </div>
 
         <footer class="col-md-12">
@@ -256,5 +282,5 @@
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-08-19 17:19:54
+Build Date UTC : 2019-09-09 21:37:22
 -->
