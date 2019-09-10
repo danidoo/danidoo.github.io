@@ -59,9 +59,10 @@
             <li><a href="#4-construindo-o-ambiente-com-o-aws-cloudformation">4. Construindo o ambiente com o AWS CloudFormation</a></li>
             <li><a href="#5-construindo-a-imagem-docker-do-clair">5. Construindo a imagem Docker do Clair:</a></li>
             <li><a href="#6-fazendo-o-deploy-do-clair-usando-o-aws-cloudformation">6. Fazendo o deploy do Clair usando o AWS CloudFormation:</a></li>
-            <li><a href="#7-fazendo-o-deploy-do-site-de-exemplo-com-o-nginx">7. Fazendo o deploy do site de exemplo com o NGINX:</a></li>
-            <li><a href="#8-criando-o-pipeline">8. Criando o pipeline</a></li>
-            <li><a href="#9-verificando-os-resultados-no-cloudwatch-logs">9. Verificando os resultados no CloudWatch Logs</a></li>
+            <li><a href="#7-crie-um-usuario-do-iam-para-login-no-codecommit">7. Crie um usuário do IAM para login no CodeCommit</a></li>
+            <li><a href="#8-fazendo-o-deploy-do-site-de-exemplo-com-o-nginx">8. Fazendo o deploy do site de exemplo com o NGINX:</a></li>
+            <li><a href="#9-criando-o-pipeline">9. Criando o pipeline</a></li>
+            <li><a href="#10-verificando-os-resultados-no-cloudwatch-logs">10. Verificando os resultados no CloudWatch Logs</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
@@ -72,20 +73,24 @@
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>1.1.</strong> Entre na página do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> no console da AWS</li>
+<li><strong>1.1.</strong> Entre na página do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> na console da AWS</li>
 <li><strong>1.2.</strong> Clique em <strong>Launch Instance</strong></li>
-<li><strong>1.3.</strong> Na barra de pesquisa, procure por <strong>BlackBelt image Clair</strong></li>
-<li><strong>1.4.</strong> Selecione <strong>BlackBelt image Clair</strong></li>
-<li><strong>1.5.</strong> Na aba seguinte selecione o botão <strong>Review and Launch</strong></li>
-<li><strong>1.6.</strong> Revise os dados da instância e clique em <strong>Launch</strong></li>
-<li><strong>1.7.</strong> Nesta parte você verá que para finalizar a criação da instância, é necessário criar ou selecionar uma chave de acesso.<ul>
-<li><strong>1.7.1.</strong> Caso você já possua uma chave a qual tenha acesso, selecione-a para esta etapa.</li>
-<li><strong>1.7.2.</strong> Caso não tenha, selecione <strong>Create a new key pair</strong>, dê um nome para a chave e baixe-a no seu computador.</li>
+<li><strong>1.3.</strong> No menu lateral, selecione <strong>Community AMIs</strong></li>
+<li><strong>1.4.</strong> Na barra de busca, procure por <strong>BlackBelt image Clair</strong></li>
+<li><strong>1.5.</strong> Ao lado do nome da imagem <strong>BlackBelt image Clair</strong>, clique em <strong>Select</strong></li>
+<li><strong>1.6.</strong> Clique <strong>Next: Configure Instance Details</strong></li>
+<li><strong>1.7.</strong> No item <strong>IAM role</strong> selecione o role <strong>Clair-CFN-Instance-Role</strong></li>
+<li><strong>1.6.</strong> Clique em <strong>Review and Launch</strong></li>
+<li><strong>1.7.</strong> Revise os dados da instância e clique em <strong>Launch</strong></li>
+<li><strong>1.8.</strong> Nesta parte você verá que para finalizar a criação da instância, é necessário criar ou selecionar uma chave de acesso.<ul>
+<li><strong>1.8.1.</strong> Caso você já possua uma chave a qual tenha acesso, selecione-a para esta etapa.</li>
+<li><strong>1.8.2.</strong> Caso não tenha, selecione <strong>Create a new key pair</strong>, dê um nome para a chave e baixe-a no seu computador.</li>
 </ul>
 </li>
-<li><strong>1.8.</strong>  Selecione <strong>Launch Instances</strong></li>
-<li><strong>1.9.</strong> Aguarde a criação da instância</li>
-<li><strong>1.3.</strong> Após a criação da instância, copie o campo "Public DNS (IPV4)" da instância que você acabou de criar e cole aqui: <input type="text" id="url-instância" onkeyup="copyval(this);"/><br>
+<li><strong>1.9.</strong>  Selecione <strong>Launch Instances</strong></li>
+<li><strong>1.10.</strong> Aguarde a criação da instância</li>
+<li><strong>1.11.</strong> Após a criação da instância, copie o campo "Public DNS (IPV4)" da instância que você acabou de criar e cole aqui<br>
+<input type="text" id="url-instancia" onkeyup="copyval(this);"/><br>
 <br>
 </details></li>
 </ul>
@@ -96,10 +101,11 @@
 <ul>
 <li><strong>2.1.</strong> Vá até a pagina do <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a> no console da AWS</li>
 <li><strong>2.2.</strong> Selecione a instância criada e clique no botão <strong>Connect</strong></li>
-<li><strong>2.3.</strong> Copie o exemplo de conexão que aparece na sua tela e cole aqui: <input type="text" id="url-acesso-instância" onkeyup="copyval(this);"/><br></li>
+<li><strong>2.3.</strong> Copie o exemplo de conexão que aparece na sua tela e cole aqui<br>
+<input type="text" id="url-acesso-instancia" onkeyup="copyval_replace(this, 'root', 'ec2-user');"/><br></li>
 <li><strong>2.4.</strong> Abra o seu terminal na pasta onde a chave de acesso está</li>
-<li><strong>2.5.</strong> Cole e rode o seguinte comando no seu terminal:
-<span class="url-acesso-instância">&lt;ssh_connect&gt;</span>
+<li><strong>2.5.</strong> Cole e rode o comando abaixo no seu terminal<br>
+<span class="url-acesso-instancia">&lt;ssh_connect&gt;</span>
 </details></li>
 </ul>
 <h3 id="3-configure-o-aws-cli-na-sua-instancia">3. Configure o AWS CLI na sua instância</h3>
@@ -107,19 +113,21 @@
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>3.1.</strong> Com você logado na instância, rode o comando <code>sudo yum update</code></li>
+<li><strong>3.1.</strong> Com você logado na instância, rode o comando<br>
+<pre>
+sudo yum update -y
+</pre></li>
 <li><strong>3.2.</strong> Aguarde a instalação dos pacotes mais atuais da AWS</li>
-<li><strong>3.3.</strong> Vamos configurar as credenciais de acesso do AWS CLI. Para isso vamos acessar o <a href="https://console.aws.amazon.com/iam/home">IAM</a> no console da AWS</li>
-<li><strong>3.4.</strong> Clique em <strong>Users</strong> e selecione um dos seus usuários</li>
-<li><strong>3.5.</strong> Clique em <strong>Security Credentials</strong></li>
-<li><strong>3.6.</strong> Clique em <strong>Create access key</strong></li>
-<li><strong>3.7.</strong> No <strong>Secret access key</strong> clique em <strong>show</strong></li>
-<li><strong>3.8.</strong> Copie o <strong>Access key ID</strong> e cole aqui: <input type="text" id="Access-key" onkeyup="copyval(this);"/><br></li>
-<li><strong>3.9.</strong> Copie o <strong>Secret access key</strong> e cole aqui: <input type="text" id="secret-key" onkeyup="copyval(this);"/><br></li>
-<li><strong>3.10.</strong> Volte para o terminal e rode <code>aws config</code></li>
-<li><strong>3.11.</strong> A primeira coisa que o <code>aws config</code> vai pedir é o <strong>AWS Access key ID</strong>: <span class="Access-key">&lt;key_id&gt;</span><br></li>
-<li><strong>3.12.</strong> Depois será a vez do <strong>AWS Secret Access Key</strong>, cole ele no seu terminal: <span class="secret-key">&lt;key&gt;</span><br></li>
-<li><strong>3.13.</strong> Agora é a vez de selecionar a região da AWS que seus serviços serão lançados. Para esta demo, escreva <code>us-east-1</code></li>
+<li><strong>3.10.</strong> Execute o comando de configuração do AWS CLI:
+<pre>
+aws configure
+</pre></li>
+<li><strong>3.11.</strong> Na configuração de <strong>AWS Access key ID</strong> deixe vazio pressionando a tecla &lt;enter&gt;</li>
+<li><strong>3.12.</strong> Depois em <strong>AWS Secret Access Key</strong> deixe novamente vazio pressionando a tecla &lt;enter&gt;</li>
+<li><strong>3.13.</strong> Na configuração de região da AWS para este laboratório usaremos<br>
+<pre>
+us-east-1
+</pre></li>
 <li><strong>3.14.</strong> No <strong>Default output format</strong> deixe vazio, somente pressione a tecla <strong>enter</strong></li>
 <li><strong>3.15.</strong> Agora temos o AWS CLI configurado com sucesso
 <br>
@@ -131,33 +139,39 @@
 <br /></p>
 <ul>
 <li>
-<p><strong>4.1.</strong> Vamos copiar os templates do CloudFormation do GitHub, para isso cole no seu terminal:</p>
-<p><code>git clone https://github.com/aws-samples/aws-codepipeline-docker-vulnerability-scan.git</code><br>
-<code>cd aws-codepipeline-docker-vulnerability-scan</code></p>
+<p><strong>4.1.</strong> Vamos copiar os templates do CloudFormation do GitHub, para isso cole no seu terminal:
+<pre>
+git clone https://github.com/aws-samples/aws-codepipeline-docker-vulnerability-scan.git
+cd aws-codepipeline-docker-vulnerability-scan
+```</p>
 </li>
 <li>
-<p><strong>4.2.</strong> O primeiro CloudFormation que vamos rodar será o de construção do ambiente de redes, como VPCs e subnets. Para isso cole no seu terminal:</p>
-<p><code>aws cloudformation create-stack \</code><br>
-<code>--stack-name coreos-clair-vpc-stack \</code><br>
-<code>--template-body file://networking-template.yaml</code><br></p>
+<p><strong>4.2.</strong> O primeiro CloudFormation que vamos rodar será o de construção do ambiente de redes, como VPCs e subnets. Para isso cole no seu terminal:
+<pre>
+aws cloudformation create-stack \
+    --stack-name coreos-clair-vpc-stack \
+    --template-body file://networking-template.yaml
+</pre></p>
 </li>
 <li>
-<p><strong>4.3.</strong> Verifique como está o estágio de criação do sua primeira stack no CloudFormation com o comando abaixo:</p>
-<p><code>aws cloudformation wait stack-create-complete \</code><br>
-<code>--stack-name coreos-clair-vpc-stack</code></p>
+<p><strong>4.3.</strong> Verifique como está o estágio de criação do sua primeira stack no CloudFormation com o comando abaixo:
+<pre>
+aws cloudformation wait stack-create-complete \
+    --stack-name coreos-clair-vpc-stack
+</pre></p>
 </li>
 <li>
-<p><strong>4.4.</strong> Após receber o status de conclusão do CloudFormation, vamos obter o output da stack:</p>
-<p><code>aws cloudformation describe-stacks \</code> <br>
-<code>--stack-name coreos-clair-vpc-stack</code></p>
+<p><strong>4.4.</strong> Após receber o status de conclusão do CloudFormation, vamos obter o output da stack:
+<pre>
+aws cloudformation describe-stacks \
+    --stack-name coreos-clair-vpc-stack
+</pre></p>
 </li>
 <li>
 <p><strong>4.5.</strong> Pegue os dados do output e salve aqui<br>
-    VPC: <input type="text" id="vpc-id" onkeyup="copyval(this);"/><br>
-    Public-subnet 1: <input type="text" id="pub-sub-1" onkeyup="copyval(this);"/><br>
-    Public-subnet 2: <input type="text" id="pub-sub-2" onkeyup="copyval(this);"/><br>
-    Private-subnet 1: <input type="text" id="priv-sub-1" onkeyup="copyval(this);"/><br>
-    Private-subnet 2: <input type="text" id="priv-sub-2" onkeyup="copyval(this);"/><br>
+    VPC Id: <input type="text" id="vpc-id" onkeyup="copyval(this);"/><br>
+    Private-subnet Ids: <input type="text" id="priv-subnets" onkeyup="copyval(this);"/><br>
+    Public-subnet Ids: <input type="text" id="pub-subnets" onkeyup="copyval(this);"/><br>
     Cloud9-environment-name: <input type="text" id="cloud9-env" onkeyup="copyval(this);"/><br>
 <br>
 </details></p>
@@ -169,136 +183,214 @@
 <br /></p>
 <ul>
 <li>
-<p><strong>5.1.</strong> A primeira coisa que vamos fazer é criar um repositório do ECR. Para isso, cole no seu terminal o comando abaixo:</p>
-<p><code>aws ecr create-repository --repository-name coreos-clair</code></p>
+<p><strong>5.1.</strong> A primeira coisa que vamos fazer é criar um repositório do ECR. Para isso, cole no seu terminal o comando abaixo:
+<pre>
+aws ecr create-repository --repository-name coreos-clair
+</pre></p>
 </li>
 <li>
-<p><strong>5.2.</strong> A execução do comando irá gerar um output no terminal. Anote os seguintes dados:<br>
-    ID: <input type="text" id="userID" onkeyup="copyval(this);"/> (<code>registryID</code>), este é o ID de sua conta AWS)<br>
-    URI:<input type="text" id="ecr-uri" onkeyup="copyval(this);"/> (<code>repositoryUri</code>)<br>
-    ARN:<input type="text" id="ecr-arn" onkeyup="copyval(this);"/> (<code>repositoryArn</code>)<br></p>
+<p><strong>5.2.</strong> A execução do comando irá gerar um output no terminal. Anote os seguintes dados abaixo:<br>
+    Registry Id: <input type="text" id="clair-userID" onkeyup="copyval(this);"/> (<code>registryID</code>), este é o ID de sua conta AWS)<br>
+    Repository ARN:<input type="text" id="clair-ecr-arn" onkeyup="copyval(this);"/> (<code>repositoryArn</code>)<br>
+    Repository URI:<input type="text" id="clair-ecr-uri" onkeyup="copyval(this);"/> (<code>repositoryUri</code>)<br></p>
 </li>
 <li>
-<p><strong>5.3.</strong>  Em seguida, construa a imagem do Docker com o comando:</p>
-<p><code>docker build -t</code> <span class="ecr-uri">&lt;ecr-uri&gt;</span><code>:latest ./coreos-clair</code></p>
+<p><strong>5.3.</strong> Inicie o daemon do docker com o comando abaixo<br>
+<pre>sudo systemctl start docker</pre></p>
 </li>
 <li>
-<p><strong>5.4.</strong> Por fim, faça o <em>push</em> da imagem para o repositório criado no ECR:</p>
-<p><code>aws ecr get-login --no-include-email | bash</code></p>
-<p><code>docker push</code> <span class="ecr-uri">&lt;ecr-uri&gt;</span><code>:latest</code></p>
+<p><strong>5.4.</strong>  Em seguida, construa a imagem do Docker com o comando:
+<pre>docker build -t <span class="clair-ecr-uri">&lt;ecr-uri&gt;</span>:latest ./coreos-clair</pre></p>
+</li>
+<li>
+<p><strong>5.5.</strong> Por fim, faça o <em>push</em> da imagem para o repositório criado no ECR:
+<pre>
+aws ecr get-login --no-include-email | bash
+docker push <span class="clair-ecr-uri">&lt;ecr-uri&gt;</span>:latest
+</pre>
+</details></p>
 </li>
 </ul>
-</details>
-
 <h3 id="6-fazendo-o-deploy-do-clair-usando-o-aws-cloudformation">6. Fazendo o deploy do Clair usando o AWS CloudFormation:</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
 <li>
-<p><strong>6.1.</strong> Vamos executar outro CloudFormation para fazer o deploy do Clair, execute o seguinte comando no <strong>terminal</strong>:</p>
-<p><code>aws cloudformation create-stack \</code><br>
-<code>--stack-name coreos-clair-stack \</code><br>
-<code>--template-body file://coreos-clair/clair-template.yaml \</code><br>
-<code>--capabilities CAPABILITY_IAM \</code><br>
-<code>--parameters \</code><br>
-<code>ParameterKey=VpcId,ParameterValue=</code><span class="vpc-id">&lt;vpc_id&gt;</span><code>\</code><br>
-<code>ParameterKey=PublicSubnets,ParameterValue=</code><span class="pub-sub-1">&lt;pub_sub_1&gt;</span><code>\\,</code><span class="pub-sub-2">&lt;su_user_id&gt;</span> <code>\</code><br>
-<code>ParameterKey=PrivateSubnets,ParameterValue=</code><span class="priv-sub-1">&lt;priv_sub_1&gt;</span><code>\\,</code><span class="priv-sub-2">&lt;su_user_id&gt;</span> <code>\</code><br>
-<code>ParameterKey=ECRRepositoryUri,ParameterValue=</code><span class="ecr-uri">&lt;ecr_uri&gt;</span></p>
+<p><strong>6.1.</strong> Vamos executar outro CloudFormation para fazer o deploy do Clair, execute o seguinte comando no <strong>terminal</strong>:
+<pre>
+aws cloudformation create-stack \
+    --stack-name coreos-clair-stack \
+    --template-body file://coreos-clair/clair-template.yaml \
+    --capabilities CAPABILITY_IAM \
+    --parameters \
+    ParameterKey="VpcId",ParameterValue="<span class="vpc-id">&lt;vpc_id&gt;</span>" \
+    ParameterKey="PublicSubnets",ParameterValue=\"<span class="pub-subnets">&lt;pub_sub_1&gt;</span>\" \
+    ParameterKey="PrivateSubnets",ParameterValue=\"<span class="priv-subnets">&lt;priv_sub_1&gt;</span>\" \
+    ParameterKey="ECRRepositoryUri",ParameterValue="<span class="clair-ecr-uri">&lt;ecr_uri&gt;</span>"
+</pre></p>
 </li>
 <li>
-<p><strong>6.2.</strong> verifique a criação do CloudFormation com o <strong>comando</strong> abaixo:</p>
-<p><code>aws cloudformation wait stack-create-complete \</code><br>
-<code>--stack-name coreos-clair-stack</code>
-<br></p>
+<p><strong>6.2.</strong> Verifique a criação do CloudFormation com o comando abaixo
+<pre>
+aws cloudformation wait stack-create-complete \
+    --stack-name coreos-clair-stack
+</pre>
+</details></p>
 </li>
 </ul>
-<h3 id="7-fazendo-o-deploy-do-site-de-exemplo-com-o-nginx">7. Fazendo o deploy do site de exemplo com o NGINX:</h3>
+<h3 id="7-crie-um-usuario-do-iam-para-login-no-codecommit">7. Crie um usuário do IAM para login no CodeCommit</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
 <li>
-<p><strong>7.1.</strong> Vamos criar um repositório do CodeCommit para armazenar o website com NGINX, para isso cole os comandos a baixo no seu <strong>terminal</strong>:
+<p><strong>7.1.</strong> No terminal da instancia, gere uma chave SSH usado o comando
+<pre>ssh-keygen -f /home/ec2-user/.ssh/codecommit_rsa -P ""</pre></p>
+</li>
+<li>
+<p><strong>7.2.</strong> Copie o conteúdo da chave pública SSH com o comando
+<pre>cat /home/ec2-user/.ssh/codecommit_rsa.pub</pre></p>
+</li>
+<li>
+<p><strong>7.3.</strong> Anote a chave publica para uso posterior abaixo<br>
+codecommit_rsa.pub: <input type="text" id="rsa-pub-key" onkeyup="copyval(this);"/><br></p>
+</li>
+<li>
+<p><strong>7.4.</strong> Entre na página do <a href="https://console.aws.amazon.com/iam/home">Amazon IAM</a> na console da AWS</p>
+</li>
+<li><strong>7.5.</strong> Clique em <strong>Users</strong> no menu lateral</li>
+<li><strong>7.6.</strong> Clique em <strong>Add user</strong></li>
+<li><strong>7.7.</strong> Em <strong>User name</strong> preencha com <strong>CodeCommit-User</strong>, em "Access type" selecione <strong>Programmatic access</strong> e clique em <strong>Next: Permissions</strong></li>
+<li><strong>7.8.</strong> Selecione <strong>Attach existing policies directly</strong> e filtre por <strong>AWSCodeCommitFullAccess</strong></li>
+<li><strong>7.9.</strong> Selecione a política <strong>AWSCodeCommitFullAccess</strong> e clique em <strong>Next: Tags</strong></li>
+<li><strong>7.10.</strong> Clique em <strong>Next: Review</strong>, verifique as configurações e clique em <strong>Create user</strong></li>
+<li><strong>7.11.</strong> Clique em <strong>Download .csv</strong> e grave o arquivo no seu computador e depois clique em <strong>Close</strong></li>
+<li><strong>7.12.</strong> Abra as configurações do usuário criado, clicando em <strong>CodeCommit-User</strong></li>
+<li><strong>7.13.</strong> Selecione a aba <strong>Security credentials</strong> e clique em <strong>Upload SSH public key</strong></li>
+<li><strong>7.14.</strong> Preencha o valor da chave com o conteúdo gerado anteriormente
+<pre><span class="rsa-pub-key">rsa-pub-key</span></pre></li>
+<li><strong>7.15.</strong> Clique em <strong>Upload SSH public Key</strong></li>
+<li><strong>7.16.</strong> Copie o valor do <strong>SSH key ID</strong> (parecido a APKA4HUQIJ3JABXNTYOY) e anote abaixo<br>
+SSH key ID: <input type="text" id="ssh-key-id" onkeyup="copyval(this);"/><br></li>
+<li><strong>7.17.</strong> 
+<pre>
+echo "Host git-codecommit.*.amazonaws.com
+  User <span class="ssh-key-id">rsa-pub-key</span>
+  IdentityFile ~/.ssh/codecommit_rsa" &gt; ~/.ssh/config
+</pre></li>
+<li><strong>7.18.</strong> 
+<pre>chmod 600 ~/.ssh/config</pre></li>
+<li>
+<p><strong>7.19.</strong> Teste a autenticação usando o comando<br>
+<pre>ssh git-codecommit.us-east-2.amazonaws.com</pre></p>
+</li>
+<li>
+<p><strong>7.20.</strong> Se bem sucedida a configuração, a saída do comando deve iniciar com "You have successfully authenticated over SSH."
+</details></p>
+</li>
+</ul>
+<h3 id="8-fazendo-o-deploy-do-site-de-exemplo-com-o-nginx">8. Fazendo o deploy do site de exemplo com o NGINX:</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>8.1.</strong> Vamos criar um repositório do CodeCommit para armazenar o website com NGINX, para isso cole os comandos a baixo no seu <strong>terminal</strong>:
 <br></p>
 <ul>
 <li>
-<p><strong>7.1.1.</strong> Crie o repositório:<br></p>
-<p><code>aws codecommit create-repository --repository-name my-nginx-website</code><br>
-<code>cd ../</code><br>
-<code>git clone &lt;cloneUrlSsh&gt;</code>
-<br></p>
+<p><strong>8.1.1.</strong> Crie o repositório:
+<pre>aws codecommit create-repository --repository-name my-nginx-website</pre></p>
 </li>
 <li>
-<p><strong>7.1.2.</strong> Copie o site NGINX do repósitório:<br></p>
-<p><code>cp -R aws-codepipeline-docker-vulnerability-scan/nginx-website/* my-nginx-website/</code><br></p>
+<p><strong>8.1.2.</strong> Anote a URL para clonar o repositório por SSH:<br>
+cloneUrlSsh: <input type="text" id="clone-url-ssh" onkeyup="copyval(this);"/><br></p>
 </li>
 <li>
-<p><strong>7.1.3.</strong> Faça os comentarios da sua alteração, e envie-lo:</p>
-<p><code>cd my-nginx-wecd mybsite/</code><br>
-<code>git add *</code><br>
-<code>git commit -m "Initial commit"</code><br>
-<code>git push</code><br></p>
+<p><strong>8.1.2.</strong> Clone o repositório usando os comandos abaixo
+<pre>
+cd ../
+git clone <span class="clone-url-ssh">&lt;CloneUrlSsh&gt;</span>
+</pre></p>
+</li>
+<li>
+<p><strong>8.1.2.</strong> Copie o site NGINX do repositório:
+<pre>cp -R aws-codepipeline-docker-vulnerability-scan/nginx-website/* my-nginx-website/</pre></p>
+</li>
+<li>
+<p><strong>8.1.3.</strong> Faça os comentarios da sua alteração, e envie-lo:
+<pre>
+cd my-nginx-website/
+git add *
+git commit -m "Initial commit"
+git push
+</pre></p>
 </li>
 </ul>
 </li>
 <li>
-<p><strong>7.2.</strong> Agora, criaremos um repositório para hospedar a imagem do site NGINX:
+<p><strong>8.2.</strong> Agora, criaremos um repositório para hospedar a imagem do site NGINX:
 <br></p>
 <ul>
 <li>
-<p><strong>7.2.1.</strong> Crie o repositório:<br></p>
-<p><code>aws ecr create-repository --repository-name nginx-website</code>
-<br></p>
+<p><strong>8.2.1.</strong> Crie o repositório:
+<pre>aws ecr create-repository --repository-name nginx-website</pre></p>
 </li>
 <li>
-<p><strong>7.2.2.</strong> Construindo a imagem do docker<br></p>
-<p><code>docker build -f Dockerfile-amznlinux -t</code><span class="ecr-uri">&lt;ecr_uri&gt;</span><code>/nginx-website:latest .</code><br></p>
+<p><strong>8.2.2.</strong> A execução do comando irá gerar um output no terminal. Anote os seguintes dados abaixo:<br>
+Registry Id: <input type="text" id="nginx-userID" onkeyup="copyval(this);"/> (<code>registryID</code>), este é o ID de sua conta AWS)<br>
+Repository ARN:<input type="text" id="nginx-ecr-arn" onkeyup="copyval(this);"/> (<code>repositoryArn</code>)<br>
+Repository URI:<input type="text" id="nginx-ecr-uri" onkeyup="copyval(this);"/> (<code>repositoryUri</code>)<br></p>
 </li>
 <li>
-<p><strong>7.2.3.</strong> Envie a imagem do docker para o repositório:<br></p>
-<p><code>docker push</code><span class="ecr-uri">&lt;ecr_uri&gt;</span><code>/nginx-website:latest</code><br></p>
+<p><strong>8.2.2.</strong> Construindo a imagem do docker<br>
+<pre>docker build -f Dockerfile-amznlinux -t <span class="nginx-ecr-uri">&lt;ecr_uri&gt;</span>:latest .</pre></p>
+</li>
+<li>
+<p><strong>8.2.3.</strong> Envie a imagem do docker para o repositório:
+<pre>docker push <span class="nginx-ecr-uri">&lt;ecr_uri&gt;</span>/nginx-website:latest</pre></p>
 </li>
 </ul>
 </li>
 <li>
-<p><strong>7.3.</strong> Então, vamos fazer o deploy do site NGINX usando o <strong>AWS CloudFormation</strong>. Coloque no seu terminal os comandos a seguir:<br></p>
+<p><strong>8.3.</strong> Então, vamos fazer o deploy do site NGINX usando o <strong>AWS CloudFormation</strong>. Coloque no seu terminal os comandos a seguir:</p>
 <ul>
 <li>
-<p><strong>7.3.1.</strong> Volte uma pasta na sua instancia:<br></p>
-<p><code>cd ../aws-codepipeline-docker-vulnerability-scan/</code>
-<br></p>
+<p><strong>8.3.1.</strong> Volte uma pasta na sua instancia:
+<pre>cd ../aws-codepipeline-docker-vulnerability-scan/</pre></p>
 </li>
 <li>
-<p><strong>7.3.2.</strong> Cole no seu terminal todas as linhas abaixo, para a criação dos recursos via <strong>CloudFormation</strong>:<br></p>
-<p><code>aws cloudformation create-stack \</code><br>
-<code>--stack-name nginx-website-stack \</code><br>
-<code>--stack-name coreos-clair-stack \</code><br>
-<code>--template-body file://nginx-website/nginx-website-template.yaml \</code><br>
-<code>--capabilities CAPABILITY_IAM \</code><br>
-<code>--parameters \</code><br>
-<code>ParameterKey=VpcId,ParameterValue=</code><span class="vpc-id">&lt;vpc_id&gt;</span><code>\</code><br>
-<code>ParameterKey=PublicSubnets,ParameterValue=</code><span class="pub-sub-1">&lt;pub_sub_1&gt;</span><code>\\,</code><span class="pub-sub-2">&lt;su_user_id&gt;</span><code>\</code><br>
-<code>ParameterKey=PrivateSubnets,ParameterValue=</code><span class="priv-sub-1">&lt;priv_sub_1&gt;</span><code>\\,</code><span class="priv-sub-2">&lt;su_user_id&gt;</span><code>\</code><br>
-<code>ParameterKey=ECRRepositoryUri,ParameterValue=</code><span class="ecr-uri">&lt;ecr_uri&gt;</span>
-<br></p>
+<p><strong>8.3.2.</strong> Cole no seu terminal todas as linhas abaixo, para a criação dos recursos via <strong>CloudFormation</strong>:
+<pre>
+aws cloudformation create-stack \
+--stack-name nginx-website-stack \
+--template-body file://nginx-website/nginx-website-template.yaml \
+--capabilities CAPABILITY_IAM \
+--parameters \
+ParameterKey="VpcId",ParameterValue="<span class="vpc-id">&lt;vpc_id&gt;</span>" \
+ParameterKey="PublicSubnets",ParameterValue=\"<span class="pub-subnets">&lt;pub_sub_1&gt;</span>\" \
+ParameterKey="PrivateSubnets",ParameterValue=\"<span class="priv-subnets">&lt;priv_sub_1&gt;</span>\" \
+ParameterKey="ECRRepositoryUri",ParameterValue="<span class="nginx-ecr-uri">&lt;ecr_uri&gt;</span>"
+</pre></p>
 </li>
 <li>
-<p><strong>7.3.3.</strong> Verifique se a construção do <strong>CloudFormation</strong> foi feita com sucesso, com o comando abaixo:<br></p>
-<p><code>aws cloudformation wait stack-create-complete \</code><br>
-<code>--stack-name nginx-website-stack</code>
-<br></p>
+<p><strong>8.3.3.</strong> Verifique se a construção do <strong>CloudFormation</strong> foi feita com sucesso, com o comando abaixo:<br>
+<pre>
+aws cloudformation wait stack-create-complete \
+--stack-name nginx-website-stack
+</pre></p>
 </li>
 <li>
-<p><strong>7.3.4.</strong> Pegue os outputs do <strong>CloudFormation</strong> que acabamos de criar colocando os seguintes comandos no seu terminal:</p>
-<p><code>aws cloudformation describe-stacks \</code><br>
-<code>--stack-name nginx-website-stack \</code><br>
-<code>--query 'Stacks[].Outputs[]'</code>
-<br></p>
+<p><strong>8.3.4.</strong> Pegue os outputs do <strong>CloudFormation</strong> que acabamos de criar colocando os seguintes comandos no seu terminal:
+<pre>
+aws cloudformation describe-stacks \
+--stack-name nginx-website-stack \
+--query 'Stacks[].Outputs[]'
+</pre></p>
 </li>
 <li>
-<p><strong>7.3.5.</strong> Cole aqui os dois outputs do <strong>CloudFormation</strong> que acabamos de criar:
+<p><strong>8.3.5.</strong> Cole aqui os dois outputs do <strong>CloudFormation</strong> que acabamos de criar:
 A url do seu <strong>loadbalancer</strong>:  <input type="text" id="url-nginx" onkeyup="copyval(this);"/>
 O nome do seu service do <strong>ECS</strong>: <input type="text" id="ecs-name" onkeyup="copyval(this);"/></p>
 </li>
@@ -308,38 +400,37 @@ O nome do seu service do <strong>ECS</strong>: <input type="text" id="ecs-name" 
 <p><br></p>
 </details>
 
-<h3 id="8-criando-o-pipeline">8. Criando o pipeline</h3>
+<h3 id="9-criando-o-pipeline">9. Criando o pipeline</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>8.1.</strong> Vamos Criar um CloudFormation para criar o pipeline com o Clair. O template a seguir cria um projeto no CodBuild, um pipeline no ColdPipeline, ua regra no Amazon CloudWatch Events e as permissões necessárias pelo IAM.</li>
-<li>
-<p><strong>8.2.</strong> Cole no seu <strong>terminal</strong> os comandos abaixo para a criação da stack no CloudFormation</p>
-<p><code>aws cloudformation create-stack \</code><br>
-<code>--stack-name nginx-website-codepipeline-stack \</code><br>
-<code>--template-body file://clair-codepipeline-template.yaml \</code><br>
-<code>--capabilities CAPABILITY_IAM \</code><br>
-<code>--disable-rollback \</code><br>
-<code>--parameters \</code><br>
-<code>ParameterKey=EcrRepositoryArn,ParameterValue=</code><span class="ecr-arn">&lt;ecr_arn&gt;</span><code>/nginx-website \</code><br>
-<code>ParameterKey=EcrRepositoryUri,ParameterValue=</code><span class="ecr-uri">&lt;ecr_uri&gt;</span><code>/nginx-website \</code><br>
-<code>ParameterKey=ClairAlbDnsName,ParameterValue=</code><span class="url-nginx">&lt;nginx_url&gt;</span><code>\</code><br>
-<code>ParameterKey=EcsServiceName,ParameterValue=</code><span class="ecs-name">&lt;ecs_name&gt;</span><code>\</code><br>
-<code>ParameterKey=NginxWebsiteCodeCommitRepoArn,ParameterValue=</code><span class="">&lt;codecommit_repo_arn&gt;</span></p>
-</li>
+<li><strong>9.1.</strong> Vamos Criar um CloudFormation para criar o pipeline com o Clair. O template a seguir cria um projeto no CodBuild, um pipeline no ColdPipeline, ua regra no Amazon CloudWatch Events e as permissões necessárias pelo IAM.</li>
+<li><strong>9.2.</strong> Cole no seu <strong>terminal</strong> os comandos abaixo para a criação da stack no CloudFormation
+<pre>
+aws cloudformation create-stack \
+    --stack-name nginx-website-codepipeline-stack \
+    --template-body file://clair-codepipeline-template.yaml \
+    --capabilities CAPABILITY_IAM \
+    --disable-rollback \
+    --parameters \
+    ParameterKey="EcrRepositoryArn",ParameterValue="<span class="nginx-ecr-arn">&lt;ecr_arn&gt;</span>" \
+    ParameterKey="EcrRepositoryUri",ParameterValue="<span class="nginx-ecr-uri">&lt;ecr_uri&gt;</span>" \
+    ParameterKey="ClairAlbDnsName",ParameterValue="<span class="url-nginx">&lt;nginx_url&gt;</span>" \
+    ParameterKey="EcsServiceName",ParameterValue="<span class="ecs-name">&lt;ecs_name&gt;</span>" \
+    ParameterKey="NginxWebsiteCodeCommitRepoArn",ParameterValue="<span class="">&lt;codecommit_repo_arn&gt;</span>"
+</pre>
+</details></li>
 </ul>
-</details>
-
-<h3 id="9-verificando-os-resultados-no-cloudwatch-logs">9. Verificando os resultados no CloudWatch Logs</h3>
+<h3 id="10-verificando-os-resultados-no-cloudwatch-logs">10. Verificando os resultados no CloudWatch Logs</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>9.1.</strong> Acesse o <a href="https://console.aws.amazon.com/cloudwatch/home">CloudWatch Logs</a> no console da AWS</li>
-<li><strong>9.2.</strong> Entre na sessão de <strong>Logs</strong>, no menu a esquerda</li>
-<li><strong>9.3.</strong> Selecione o <em>/aws/codebuild/nginx-codeBuild-project</em>, para que você possa fazer a analise</li>
-<li><strong>9.4.</strong> Lá fica salvo todos os logs dentro das pastas, lá se pode verificar todas as vunerabilidades que foram encontradas pelo Clair.</li>
+<li><strong>10.1.</strong> Acesse o <a href="https://console.aws.amazon.com/cloudwatch/home">CloudWatch Logs</a> no console da AWS</li>
+<li><strong>10.2.</strong> Entre na sessão de <strong>Logs</strong>, no menu a esquerda</li>
+<li><strong>10.3.</strong> Selecione o <em>/aws/codebuild/nginx-codeBuild-project</em>, para que você possa fazer a analise</li>
+<li><strong>10.4.</strong> Lá fica salvo todos os logs dentro das pastas, lá se pode verificar todas as vunerabilidades que foram encontradas pelo Clair.</li>
 </ul>
 </details></div>
         </div>
@@ -425,5 +516,5 @@ O nome do seu service do <strong>ECS</strong>: <input type="text" id="ecs-name" 
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-08-26 19:27:56
+Build Date UTC : 2019-09-10 03:02:22
 -->
