@@ -90,39 +90,39 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#creando-un-website-cifrado-con-tls-usando-llaves-del-cloudhsm">Creando un Website cifrado con TLS usando llaves del CloudHSM</a></li>
-            <li><a href="#1-cree-un-usuario-para-el-servidor-web-y-comparta-llave-privada">1. Cree un usuario para el servidor web y comparta llave privada</a></li>
+        <li class="main active"><a href="#crie-um-website-cifrado-com-tls-usando-operacoes-criptograficas-no-cloudhsm">Crie um Website cifrado com TLS usando operações criptográficas no CloudHSM</a></li>
+            <li><a href="#1-crie-um-usuario-para-o-servidor-web-e-compartilhe-a-chave-privada">1. Crie um usuário para o servidor web e compartilhe a chave privada</a></li>
             <li><a href="#2-cree-un-servidor-web-usando-la-llave-en-el-cloudhsm">2. Cree un servidor web usando la llave en el CloudHSM</a></li>
             <li><a href="#3-haga-la-configuracion-del-webserver1">3. Haga la configuración del webserver1</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h2 id="creando-un-website-cifrado-con-tls-usando-llaves-del-cloudhsm">Creando un Website cifrado con TLS usando llaves del CloudHSM</h2>
-<h3 id="1-cree-un-usuario-para-el-servidor-web-y-comparta-llave-privada">1. Cree un usuario para el servidor web y comparta llave privada</h3>
+<h2 id="crie-um-website-cifrado-com-tls-usando-operacoes-criptograficas-no-cloudhsm">Crie um Website cifrado com TLS usando operações criptográficas no CloudHSM</h2>
+<h3 id="1-crie-um-usuario-para-o-servidor-web-e-compartilhe-a-chave-privada">1. Crie um usuário para o servidor web e compartilhe a chave privada</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>1.1.</strong> Abra en una nueva pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/cloudwatch/home">AWS CloudWatch</a> en la terminal de la instancia</li>
-<li><strong>1.2.</strong> Seleccione el <strong>Logs</strong> en el menu lateral</li>
-<li><strong>1.3.</strong> Haga click en el "Log Group" con el nombre <strong>/aws/cloudhsm/cluster-&lt;cluster_id&gt;</strong> y después en <strong>Search Log Group</strong></li>
-<li><strong>1.4.</strong> Filtre los logs por el evento de generación de par de llaves <strong>CN_GENERATE_KEY_PAIR</strong></li>
+<li><strong>1.1.</strong> Abra em uma nova janela ou aba do navegador no serviço<a href="https://console.aws.amazon.com/cloudwatch/home">AWS CloudWatch</a> no terminal da instancia</li>
+<li><strong>1.2.</strong> Selecione <strong>Logs</strong> no menu lateral</li>
+<li><strong>1.3.</strong> Clique no "Log Group" com o nome <strong>/aws/cloudhsm/cluster-&lt;cluster_id&gt;</strong> e depois clique em <strong>Search Log Group</strong></li>
+<li><strong>1.4.</strong> Filtre os logs pelo evento de geração do par de chaves <strong>CN_GENERATE_KEY_PAIR</strong></li>
 <li>
-<p><strong>1.5.</strong> Haga click en la flecha para expandir los logs</p>
-<p>Entre el <strong>Key Handle</strong> de la llave privada generada con openssl: <input type="text" id="openssl-priv-key-handle" onkeyup="copyval(this);"/><br>
+<p><strong>1.5.</strong> Clique na flecha para expandir os logs</p>
+<p>Tome nota do <strong>Key Handle</strong> da chave privada gerada com o OpenSSL: <input type="text" id="openssl-priv-key-handle" onkeyup="copyval(this);"/><br>
 <br></p>
 </li>
 <li>
-<p><strong>1.6.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</p>
+<p><strong>1.6.</strong> Volte a janea ou aba do navegador no serviço <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> no terminal da instancia</p>
 </li>
 <li>
-<p><strong>1.7.</strong> Entre en el agente de administración del cluster con el comando:</p>
-<p>./cloudhsm_mgmt_util.sh</p>
+<p><strong>1.7.</strong> Entre no agente de gestão do cluster com o comando:
+<pre>./cloudhsm_mgmt_util.sh</pre></p>
 </li>
 <li>
-<p><strong>1.8.</strong> Login</p>
-<p>loginHSM CO admin defaultPassword</p>
+<p><strong>1.8.</strong> Faça login com o comando:
+<pre>loginHSM CO admin defaultPassword</pre></p>
 </li>
 <li>
 <p><strong>1.9.</strong> Cree un nuevo usuario para el servidor web</p>
