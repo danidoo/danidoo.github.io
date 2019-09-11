@@ -400,18 +400,26 @@ ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util
 <pre>changePswd PRECO admin defaultPassword</pre></p>
 </li>
 <li>
-<p><strong>13.12.</strong> Quando receber o prompt <strong>Do you want to continue(y/n)?</strong> digita <strong>y &lt;enter&gt;</strong></p>
+<p><strong>13.12.</strong> Quando receber o prompt <strong>Do you want to continue(y/n)?</strong> digite <strong>y &lt;enter&gt;</strong></p>
 </li>
 <li>
-<p><strong>13.13.</strong> Use o comando “createUser“ para criar um crypto user (CU).
+<p><strong>13.13.</strong> Faça logout do usuário PRECO admin com o comando:
+<pre>logoutHSM</pre></p>
+</li>
+<li>
+<p><strong>13.14.</strong> Faça login agora com a nova senha e tipo de administrador com o comando:
+<pre>loginHSM CO admin defaultPassword</pre></p>
+</li>
+<li>
+<p><strong>13.14.</strong> Use o comando “createUser“ para criar um crypto user (CU).
 <pre>createUser CU user1 defaultPassword</pre></p>
 </li>
 <li>
-<p><strong>13.14.</strong> Veja que o CloudHSM muda o tipo de usuário do cripto officer e mostra o novo usuário <strong>user1</strong>:
+<p><strong>13.15.</strong> Veja que o CloudHSM muda o tipo de usuário do cripto officer e mostra o novo usuário <strong>user1</strong>:
 <pre>listUsers</pre></p>
 </li>
 <li>
-<p><strong>13.15.</strong> Termine a sessão com o comando:
+<p><strong>13.16.</strong> Termine a sessão com o comando:
 <pre>quit</pre></p>
 </li>
 </ul></div>

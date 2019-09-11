@@ -125,36 +125,36 @@
 <pre>loginHSM CO admin defaultPassword</pre></p>
 </li>
 <li>
-<p><strong>1.9.</strong> Cree un nuevo usuario para el servidor web</p>
-<p>createUser CU webserver1 defaultPassword</p>
+<p><strong>1.9.</strong> Crie um novo usuário para o servidor web
+<pre>createUser CU webserver1 defaultPassword</pre></p>
 </li>
 <li>
-<p><strong>1.10.</strong> Tome nota del numero de usuario para compartirle la llave en un paso posterior</p>
-<p>listUsers</p>
-<p>Entre el <strong>User ID</strong> del usuario <strong>webserver1</strong>: <input type="text" id="webserver1-user-id" onkeyup="copyval(this);"/><br>
+<p><strong>1.10.</strong> Anote o número de usuário para compartilhar a chave no passo posterior
+<pre>listUsers</pre></p>
+<p>Ponha aqui o <strong>User ID</strong> do usuário <strong>webserver1</strong>: <input type="text" id="webserver1-user-id" onkeyup="copyval(this);"/><br>
 <br></p>
 </li>
 <li>
-<p><strong>1.11.</strong> Haga logout del CloudHSM como usuario Crypto Officer admin:</p>
-<p>logoutHSM</p>
+<p><strong>1.11.</strong> Faça logout do CloudHSM como usuário Crypto Officer admin:
+<pre>logoutHSM</pre></p>
 </li>
 <li>
-<p><strong>1.12.</strong> Haga login al CloudHSM como el usuario user1 que es administrador de la llave que sera compartida:</p>
-<p>loginHSM CU user1 defaultPassword</p>
+<p><strong>1.12.</strong> Faça login no CloudHSM como o usuário user1 que é administrador da chave que será compartilhada:
+<pre>loginHSM CU user1 defaultPassword</pre></p>
 </li>
 <li>
-<p><strong>1.13.</strong> Comparta la llave privada con el usuario webserver1 con el comando:</p>
-<p>shareKey <span class="openssl-priv-key-handle">&lt;public key handle&gt;</span> <span class="webserver1-user-id">&lt;webserver1 user id&gt;</span>  1</p>
+<p><strong>1.13.</strong> Compartilhe a chave privada com o usuário webserver1 através do comando:
+<pre>shareKey <span class="openssl-priv-key-handle">&lt;public key handle&gt;</span> <span class="webserver1-user-id">&lt;webserver1 user id&gt;</span>  1</pre></p>
 </li>
 <li>
-<p><strong>1.14.</strong> Ahora intentemos exportar la llave como el usuario webserver1. Para eso generaremos una llava para wrapping con el comando:</p>
-<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword genSymKey -t 31 -s 32 -l wrappingKey</p>
-<p>Entre el <strong>Key Handle</strong> de la llave generada: <input type="text" id="webserver1-wrapping-key-handle" onkeyup="copyval(this);"/><br>
+<p><strong>1.14.</strong> Agora faremos o teste de exportar a chave como o usuário webserver1. Para isso geraremos uma chave de wrapping com o comando:
+<pre>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword genSymKey -t 31 -s 32 -l wrappingKey</pre></p>
+<p>Ponha aqui o <strong>Key Handle</strong> da chave gerada: <input type="text" id="webserver1-wrapping-key-handle" onkeyup="copyval(this);"/><br>
 <br></p>
 </li>
 <li>
-<p><strong>1.15.</strong> Y intente exportar la llave con el comando:</p>
-<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword exportPrivateKey -k <span class="openssl-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="webserver1-wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver_priv.key</p>
+<p><strong>1.15.</strong> Agore faça a tentativa de exportar a chave com o comando:
+<pre>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword exportPrivateKey -k <span class="openssl-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="webserver1-wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver_priv.key</pre></p>
 <p>El CloudHSM no permitirá exportar essa llave pues el usuario webserver1 no es administrador de la llave, apenas la tiene compartida para operaciones de cifrado con ella.
 </details></p>
 </li>
