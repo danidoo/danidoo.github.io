@@ -94,7 +94,7 @@
             <li><a href="#1-crie-um-ambiente-de-redes-vpc-subnets-etc">1. Crie um ambiente de redes (VPC, Subnets, etc.)</a></li>
             <li><a href="#2-crie-um-cluster">2. Crie um cluster</a></li>
             <li><a href="#3-crie-um-bucket-s3-para-armazenamento-de-objetos">3. Crie um bucket S3 para armazenamento de objetos</a></li>
-            <li><a href="#4-crie-um-bukcet-s3-para-armazemaneto-de-sessoes">4. Crie um bukcet S3 para armazemaneto de sessões</a></li>
+            <li><a href="#4-crie-um-bucket-s3-para-armazemaneto-de-sessoes">4. Crie um bucket S3 para armazemaneto de sessões</a></li>
             <li><a href="#5-crie-uma-politica-de-iam-de-acesso-ao-bucket-s3-criado-anteriormente">5. Crie uma política de IAM de acesso ao bucket S3 criado anteriormente</a></li>
             <li><a href="#6-crie-um-role-iam-para-instancias-ec2-gerenciadas-pelo-ssm-systems-manager">6. Crie um role IAM para instancias EC2 gerenciadas pelo SSM Systems Manager</a></li>
             <li><a href="#7-crie-um-cloudhsm-no-cluster">7. Crie um CloudHSM no Cluster</a></li>
@@ -137,7 +137,7 @@ Se a infraestrutura básica foi criada no módulo anterior, você poderá saltar
 <br /></p>
 <ul>
 <li><strong>2.1.</strong> Em uma nova janela ou aba do navegador abra a console da AWS no serviço <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a> na região de N. Virginia</li>
-<li><strong>2.2.</strong> Clique em <strong>Create cluster</strong>, e usando os IDs do VPC e subnets, escolha os parametros adequedos</li>
+<li><strong>2.2.</strong> Clique em <strong>Create cluster</strong>, e usando os IDs do VPC e subnets, escolha os ids das subnets protegidas (preencha com as subnets nas AZs a - f)</li>
 <li><strong>2.3.</strong> Deixe a opção <strong>Create new cluster</strong> selecionada e clique em <strong>Next: Review</strong> e depois em <strong>Create cluster</strong></li>
 <li><strong>2.4.</strong> A criação do cluster pode levar até 10 minutos. Continue com a próxima etapa enquanto o processo corre.
 </details></li>
@@ -156,7 +156,7 @@ Se a infraestrutura básica foi criada no módulo anterior, você poderá saltar
 <li><strong>3.2.</strong> Clique em <strong>Create</strong>
 </details></li>
 </ul>
-<h3 id="4-crie-um-bukcet-s3-para-armazemaneto-de-sessoes">4. Crie um bukcet S3 para armazemaneto de sessões</h3>
+<h3 id="4-crie-um-bucket-s3-para-armazemaneto-de-sessoes">4. Crie um bucket S3 para armazemaneto de sessões</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>

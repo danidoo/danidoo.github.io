@@ -95,7 +95,7 @@
             <li><a href="#2-importando-una-llave-aes-256-al-cloudhsm">2. Importando una llave AES-256 al CloudHSM</a></li>
             <li><a href="#3-exportando-a-chave-aes-256-do-cloudhsm">3. Exportando a chave AES-256 do CloudHSM</a></li>
             <li><a href="#4-usando-o-openssl-con-com-chaves-do-cloudhsm">4. Usando o OpenSSL con com chaves do CloudHSM</a></li>
-            <li><a href="#5-ponga-el-certificado-y-fake_pem-en-el-bucket-s3">5. Ponga el certificado y fake_pem en el bucket S3</a></li>
+            <li><a href="#5-ponha-o-certificado-e-fake_pem-em-um-bucket-s3">5. Ponha o certificado e fake_pem em um bucket S3</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
@@ -209,33 +209,33 @@ sudo yum install -y ./cloudhsm-client-dyn-latest.el7.x86_64.rpm
 </pre></p>
 </li>
 <li>
-<p><strong>4.2.</strong> Configure AS credenciais</p>
-<p>export n3fips_password=user1:defaultPassword<br></p>
+<p><strong>4.2.</strong> Configure AS credenciais
+<pre>export n3fips_password=user1:defaultPassword</pre></p>
 </li>
 <li>
-<p><strong>4.3.</strong> Cree un key pair</p>
-<p>openssl genrsa -engine cloudhsm -out fake_pem.key 2048<br></p>
+<p><strong>4.3.</strong> Crie um par de chaves
+<pre>openssl genrsa -engine cloudhsm -out fake_pem.key 2048</pre></p>
 </li>
 <li>
-<p><strong>4.4.</strong> Cree un CSR</p>
-<p>openssl req -engine cloudhsm -new -key fake_pem.key -out webserver.csr<br></p>
+<p><strong>4.4.</strong> Crie um CSR
+<pre>openssl req -engine cloudhsm -new -key fake_pem.key -out webserver.csr</pre></p>
 </li>
 <li>
-<p><strong>4.4.</strong> Cree un Certificado auto-firmado con el comando:</p>
-<p>openssl x509 -engine cloudhsm -req -days 365 -in webserver.csr -signkey fake_pem.key -out webserver.crt<br>
+<p><strong>4.4.</strong> Crie un certificado auto-assinado com o comando:
+<pre>openssl x509 -engine cloudhsm -req -days 365 -in webserver.csr -signkey fake_pem.key -out webserver.crt</pre>
 </details></p>
 </li>
 </ul>
-<h3 id="5-ponga-el-certificado-y-fake_pem-en-el-bucket-s3">5. Ponga el certificado y fake_pem en el bucket S3</h3>
+<h3 id="5-ponha-o-certificado-e-fake_pem-em-um-bucket-s3">5. Ponha o certificado e fake_pem em um bucket S3</h3>
 <p><details open>
 <summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li>
-<p><strong>5.1.</strong> Envie el archivo PEM de llave y el certificado generado al bucket S3 con los comandos</p>
-<p>aws s3 cp ./fake_pem.key s3://crypto-<span class="user-id">&lt;su user id&gt;</span>/<br>
-aws s3 cp ./webserver.crt s3://crypto-<span class="user-id">&lt;su user id&gt;</span>/<br></p>
-</li>
+<li><strong>5.1.</strong> Envie o arquivo PEM de chave e certificado gerado para o bucket S3 com os comandos
+<pre>
+aws s3 cp ./fake_pem.key s3://crypto-<span class="user-id">&lt;su user id&gt;</span>/
+aws s3 cp ./webserver.crt s3://crypto-<span class="user-id">&lt;su user id&gt;</span>/
+</pre></li>
 </ul></div>
         </div>
 
