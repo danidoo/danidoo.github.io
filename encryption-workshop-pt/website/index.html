@@ -92,7 +92,7 @@
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#crie-um-website-cifrado-com-tls-usando-operacoes-criptograficas-no-cloudhsm">Crie um Website cifrado com TLS usando operações criptográficas no CloudHSM</a></li>
             <li><a href="#1-crie-um-usuario-para-o-servidor-web-e-compartilhe-a-chave-privada">1. Crie um usuário para o servidor web e compartilhe a chave privada</a></li>
-            <li><a href="#2-cree-un-servidor-web-usando-la-llave-en-el-cloudhsm">2. Cree un servidor web usando la llave en el CloudHSM</a></li>
+            <li><a href="#2-crie-um-servidor-web-usando-a-chave-no-cloudhsm">2. Crie um servidor web usando a chave no CloudHSM</a></li>
             <li><a href="#3-haga-la-configuracion-del-webserver1">3. Haga la configuración del webserver1</a></li>
     </ul>
 </div></div>
@@ -101,7 +101,7 @@
 <h2 id="crie-um-website-cifrado-com-tls-usando-operacoes-criptograficas-no-cloudhsm">Crie um Website cifrado com TLS usando operações criptográficas no CloudHSM</h2>
 <h3 id="1-crie-um-usuario-para-o-servidor-web-e-compartilhe-a-chave-privada">1. Crie um usuário para o servidor web e compartilhe a chave privada</h3>
 <p><details open>
-<summary><strong>(detalles)</strong></summary>
+<summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
 <li><strong>1.1.</strong> Abra em uma nova janela ou aba do navegador no serviço<a href="https://console.aws.amazon.com/cloudwatch/home">AWS CloudWatch</a> no terminal da instancia</li>
@@ -155,46 +155,46 @@
 <li>
 <p><strong>1.15.</strong> Agore faça a tentativa de exportar a chave com o comando:
 <pre>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword exportPrivateKey -k <span class="openssl-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="webserver1-wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver_priv.key</pre></p>
-<p>El CloudHSM no permitirá exportar essa llave pues el usuario webserver1 no es administrador de la llave, apenas la tiene compartida para operaciones de cifrado con ella.
+<p>O CloudHSM não permitirá exportar esta chave, pois o usuário webserver1 não é administrador da chave, apenas tem acesso à chave para operações criptográficasde la llave, apenas la tiene compartida para operaciones de cifrado con ella.
 </details></p>
 </li>
 </ul>
-<h3 id="2-cree-un-servidor-web-usando-la-llave-en-el-cloudhsm">2. Cree un servidor web usando la llave en el CloudHSM</h3>
+<h3 id="2-crie-um-servidor-web-usando-a-chave-no-cloudhsm">2. Crie um servidor web usando a chave no CloudHSM</h3>
 <p><details open>
-<summary><strong>(detalles)</strong></summary>
+<summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>2.1.</strong> Vuelva a pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a></li>
+<li><strong>2.1.</strong> Volte para a janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a></li>
 <li><strong>2.2.</strong> Haga click en <strong>Launch Instance</strong></li>
-<li><strong>2.3.</strong> Seleccione la AMI <strong>Amazon Linux 2 AMI</strong> haciendo click en <strong>Select</strong> en la linea que corresponde</li>
-<li><strong>2.4.</strong> Deje seleccionado el tipo de instancia t2.micro y haga click en <strong>Next: Configure Instance Details</strong></li>
-<li><strong>2.5.</strong> En la opción <strong>Network</strong> elija la VPC con nombre <strong>cloudhsm-vpc</strong></li>
-<li><strong>2.6.</strong> En la opción <strong>Subnet</strong> elija la Subnet con nombre <strong>public-subnet-us-east-1a</strong></li>
-<li><strong>2.7.</strong> En IAM role seleccione el perfil <strong>EC2-SSM+S3Crypto</strong> y haga click en <strong>Next: Add Storage</strong></li>
-<li><strong>2.8.</strong> Haga click en <strong>Next: Add Tags</strong></li>
-<li><strong>2.9.</strong> Haga click en <strong>Add Tag</strong>, en el campo "Key" llene con <strong>Name</strong> y en el campo "Value" llene con <strong>webserver1</strong></li>
-<li><strong>2.10.</strong> Haga click en <strong>Next: Configure Security Group</strong></li>
-<li><strong>2.11.</strong> Deje <strong>Create a new security group</strong> seleccionado y en "Security group name" llene con <strong>webserver1-sg</strong></li>
-<li><strong>2.12.</strong> Borre la linea de configuración de acceso SSH haciendo click en el icono <strong>X</strong></li>
-<li><strong>2.13.</strong> Haga click en <strong>Add Rule</strong>, en el campo "Type" seleccione <strong>HTTPS</strong> y deje los otros campos con el valor por defecto</li>
-<li><strong>2.14.</strong> Haga click en <strong>Review and Launch</strong> y después en <strong>Launch</strong></li>
-<li><strong>2.15.</strong> Remplaze la opción "Choose an existing key pair" por <strong>Proceed without a key pair</strong></li>
-<li><strong>2.16.</strong> Seleccione <strong>I acknowledge that I will not (...)</strong> y haga click en <strong>Launch Instance</strong></li>
-<li><strong>2.17.</strong> Haga click en <strong>View Instances</strong></li>
-<li><strong>2.18.</strong> Seleccione la instancia con nombre <strong>webserver1</strong></li>
-<li><strong>2.19.</strong> Haga click en <strong>Actions</strong>, seleccione <strong>Networking</strong> y haga click en <strong>Change Security Groups</strong></li>
-<li><strong>2.20.</strong> Deje seleccionado el Security Group <strong>webserver1-sg</strong> y seleccione también el grupo **cloudhsm-cluster-&lt;cluster id&gt;-sg</li>
-<li><strong>2.21.</strong> Haga click en <strong>Assign Security Groups</strong></li>
+<li><strong>2.3.</strong> Selecione a AMI <strong>Amazon Linux 2 AMI</strong> clicando em <strong>Select</strong> na linha correspondente</li>
+<li><strong>2.4.</strong> Deixe selecionado o tipo de instancia t2.micro e clique em <strong>Next: Configure Instance Details</strong></li>
+<li><strong>2.5.</strong> Na opção <strong>Network</strong> escolha a VPC com o nome <strong>cloudhsm-vpc</strong></li>
+<li><strong>2.6.</strong> Na opção <strong>Subnet</strong> escolha a Subnet com nome <strong>public-subnet-us-east-1a</strong></li>
+<li><strong>2.7.</strong> No IAM role selecione o role <strong>EC2-SSM+S3Crypto</strong> e clique em <strong>Next: Add Storage</strong></li>
+<li><strong>2.8.</strong> Clique em <strong>Next: Add Tags</strong></li>
+<li><strong>2.9.</strong> Clique em <strong>Add Tag</strong>, no campo "Key" preencha com <strong>Name</strong> e no campo "Value" preencha com <strong>webserver1</strong></li>
+<li><strong>2.10.</strong> Clique em  <strong>Next: Configure Security Group</strong></li>
+<li><strong>2.11.</strong> Deixe <strong>Create a new security group</strong> selecionado e em "Security group name" preencha com <strong>webserver1-sg</strong></li>
+<li><strong>2.12.</strong> Apague a linha de configuração de acesso SSH clicando no icone <strong>X</strong> no final da linha</li>
+<li><strong>2.13.</strong> Clique em <strong>Add Rule</strong>, e no campo "Type" selecione <strong>HTTPS</strong> e deixe os outros campos com o valor padrão</li>
+<li><strong>2.14.</strong> Clique em <strong>Review and Launch</strong> e depois em <strong>Launch</strong></li>
+<li><strong>2.15.</strong> Troque a opção "Choose an existing key pair" por <strong>Proceed without a key pair</strong></li>
+<li><strong>2.16.</strong> Selecione <strong>I acknowledge that I will not (...)</strong> e clique em <strong>Launch Instance</strong></li>
+<li><strong>2.17.</strong> Clique em <strong>View Instances</strong></li>
+<li><strong>2.18.</strong> Selecione a instancia com nome <strong>webserver1</strong></li>
+<li><strong>2.19.</strong> Clique em <strong>Actions</strong>, selecione <strong>Networking</strong> e de clique em <strong>Change Security Groups</strong></li>
+<li><strong>2.20.</strong> Deixe selecionado o Security Group <strong>webserver1-sg</strong> e selecione também o Security Group **cloudhsm-cluster-&lt;cluster id&gt;-sg</li>
+<li><strong>2.21.</strong> Clique <strong>Assign Security Groups</strong></li>
 <li>
-<p><strong>2.22.</strong> Tome nota de la dirección IP publica en <strong>IPv4 Public IP</strong></p>
-<p>Entre el <strong>IP Address</strong>: <input type="text" id="instance-ip" onkeyup="copyval(this);"/><br>
+<p><strong>2.22.</strong> Tome nota do endereço IP público em <strong>IPv4 Public IP</strong></p>
+<p>Ponha aqui o <strong>IP Address</strong>: <input type="text" id="instance-ip" onkeyup="copyval(this);"/><br>
 <br>
 </details></p>
 </li>
 </ul>
 <h3 id="3-haga-la-configuracion-del-webserver1">3. Haga la configuración del webserver1</h3>
 <p><details open>
-<summary><strong>(detalles)</strong></summary>
+<summary><strong>(detalhes)</strong></summary>
 <br /></p>
 <p>Entre el <strong>user id</strong> o valor aleatorio usado anteriormente: <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
 Entre el <strong>HSM IP Address</strong>: <input type="text" id="cloudhsm-ip" onkeyup="copyval(this);"/><br>

@@ -306,9 +306,13 @@ aws configure
 <pre>openssl req -new -x509 -days 3652 -key customerCA.key -out customerCA.crt</pre>
 
 <ul>
-<li><strong>11.12.</strong> Usa a pass phrase criada anteriormente e escolha as opções que preferir para os dados do certificado digital</li>
+<li><strong>11.12.</strong> Use a pass phrase criada anteriormente e escolha as opções que preferir para os dados do certificado digital</li>
 <li>
-<p><strong>11.13.</strong> Assine o CSR com o comando:
+<p><strong>11.13.</strong> Envie o arquivo customerCA.crt para o bucket S3 para uso posterior
+<pre>aws s3 cp ./customerCA.crt s3://crypto-<span class="user-id">&lt;seu user id&gt;</span></pre></p>
+</li>
+<li>
+<p><strong>11.14.</strong> Assine o CSR com o comando:
 <pre>
 openssl x509 -req -days 3652 -in <span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>_ClusterCsr.csr \
 -CA customerCA.crt \
@@ -318,10 +322,10 @@ openssl x509 -req -days 3652 -in <span class="cluster-id">&lt;cluster-xxxxxxxxxx
 </pre></p>
 </li>
 <li>
-<p><strong>11.14.</strong> Use o pass phrase criado anteriormente</p>
+<p><strong>11.15.</strong> Use o pass phrase criado anteriormente</p>
 </li>
 <li>
-<p><strong>11.15.</strong> Inicialize o cluster com o comando:
+<p><strong>11.16.</strong> Inicialize o cluster com o comando:
 <pre>
 aws cloudhsmv2 initialize-cluster --cluster-id <span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span> \
 --signed-cert file://CustomerHsmCertificate.crt \
@@ -329,10 +333,10 @@ aws cloudhsmv2 initialize-cluster --cluster-id <span class="cluster-id">&lt;clus
 </pre></p>
 </li>
 <li>
-<p><strong>11.16.</strong> Volte à janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></p>
+<p><strong>11.17.</strong> Volte à janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></p>
 </li>
-<li><strong>11.17.</strong> Clique no botão para atualizar as informações e veja que o status do cluster está em <strong>Initialize in progress</strong></li>
-<li><strong>11.18.</strong> O processo de inicialização do cluster leva cerca de 5 minutos. Siga para a próxima etapa enquanto o processo segue
+<li><strong>11.18.</strong> Clique no botão para atualizar as informações e veja que o status do cluster está em <strong>Initialize in progress</strong></li>
+<li><strong>11.19.</strong> O processo de inicialização do cluster leva cerca de 5 minutos. Siga para a próxima etapa enquanto o processo segue
 </details></li>
 </ul>
 <h3 id="12-use-o-cliente-do-cloudhsm-para-conectar-ao-cluster">12. Use o cliente do CloudHSM para conectar ao cluster</h3>

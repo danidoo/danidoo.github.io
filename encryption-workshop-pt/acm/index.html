@@ -90,16 +90,16 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#creando-un-website-cifrado-con-tls-usando-llaves-del-cloudhsm">Creando un Website cifrado con TLS usando llaves del CloudHSM</a></li>
-            <li><a href="#1-cree-un-usuario-para-el-servidor-web-y-comparta-llave-privada">1. Cree un usuario para el servidor web y comparta llave privada</a></li>
+        <li class="main active"><a href="#importando-chaves-do-cloudhsm-no-certificate-manager">Importando chaves do CloudHSM no Certificate Manager</a></li>
+            <li><a href="#1-exporte-as-chaves-do-cloudhsm-e-importe-o-certificado-para-o-certificate-manager">1. Exporte as chaves do CloudHSM e importe o certificado para o Certificate Manager</a></li>
             <li><a href="#2-cree-un-balanceador-usando-el-certificado-importado">2. Cree un balanceador usando el certificado importado</a></li>
             <li><a href="#3-agregue-http-al-security-group-el-webserver1">3. Agregue HTTP al Security Group el webserver1</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h2 id="creando-un-website-cifrado-con-tls-usando-llaves-del-cloudhsm">Creando un Website cifrado con TLS usando llaves del CloudHSM</h2>
-<h3 id="1-cree-un-usuario-para-el-servidor-web-y-comparta-llave-privada">1. Cree un usuario para el servidor web y comparta llave privada</h3>
+<h2 id="importando-chaves-do-cloudhsm-no-certificate-manager">Importando chaves do CloudHSM no Certificate Manager</h2>
+<h3 id="1-exporte-as-chaves-do-cloudhsm-e-importe-o-certificado-para-o-certificate-manager">1. Exporte as chaves do CloudHSM e importe o certificado para o Certificate Manager</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
@@ -127,7 +127,7 @@
 <p>loginHSM -u CU -s user1 -p defaultPassword</p>
 </li>
 <li>
-<p><strong>1.9.</strong> Exporte la llave publica generado con el openssl:</p>
+<p><strong>1.9.</strong> Exporte la llave publica generada con el openssl:</p>
 <p>exportPrivateKey -k <span class="openss-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver.pem</p>
 </li>
 <li>
