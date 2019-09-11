@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>ACM - Encryption Workshop</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="..">Encryption Workshop</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="..">Início</a>
+                            </li>
+                            <li >
+                                <a href="../cluster_init/">Inicialização</a>
+                            </li>
+                            <li >
+                                <a href="../key_management/">Gestão de chaves</a>
+                            </li>
+                            <li >
+                                <a href="../website/">Website</a>
+                            </li>
+                            <li class="active">
+                                <a href="./">ACM</a>
+                            </li>
+                            <li >
+                                <a href="../kms/">KMS</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../website/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../kms/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#creando-un-website-cifrado-con-tls-usando-llaves-del-cloudhsm">Creando un Website cifrado con TLS usando llaves del CloudHSM</a></li>
+            <li><a href="#1-cree-un-usuario-para-el-servidor-web-y-comparta-llave-privada">1. Cree un usuario para el servidor web y comparta llave privada</a></li>
+            <li><a href="#2-cree-un-balanceador-usando-el-certificado-importado">2. Cree un balanceador usando el certificado importado</a></li>
+            <li><a href="#3-agregue-http-al-security-group-el-webserver1">3. Agregue HTTP al Security Group el webserver1</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="creando-un-website-cifrado-con-tls-usando-llaves-del-cloudhsm">Creando un Website cifrado con TLS usando llaves del CloudHSM</h2>
+<h3 id="1-cree-un-usuario-para-el-servidor-web-y-comparta-llave-privada">1. Cree un usuario para el servidor web y comparta llave privada</h3>
+<p><details open>
+<summary><strong>(detalles)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>1.1.</strong> Abra en una nueva pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/cloudwatch/home">AWS CloudWatch</a> en la terminal de la instancia</li>
+<li><strong>1.2.</strong> Seleccione el <strong>Logs</strong> en el menu lateral</li>
+<li><strong>1.3.</strong> Haga click en el "Log Group" con el nombre <strong>/aws/cloudhsm/cluster-&lt;cluster_id&gt;</strong> y después en <strong>Search Log Group</strong></li>
+<li><strong>1.4.</strong> Filtre los logs por el evento de generación de par de llaves <strong>CN_GENERATE_KEY_PAIR</strong></li>
+<li>
+<p><strong>1.5.</strong> Haga click en la flecha para expandir los logs</p>
+<p>Entre el <strong>Key Handle</strong> de la llave privada generada con openssl: <input type="text" id="openssl-priv-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+<p>Entre el <strong>Key Handle</strong> de la llave de wrapping generada en el CloudHSM: <input type="text" id="wrapping-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+</li>
+<li>
+<p><strong>1.6.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</p>
+</li>
+<li>
+<p><strong>1.7.</strong> Entre en el agente de administración del cluster con el comando:</p>
+<p>./cloudhsm_mgmt_util.sh</p>
+</li>
+<li>
+<p><strong>1.8.</strong> Haga login en el CloudHSM</p>
+<p>loginHSM -u CU -s user1 -p defaultPassword</p>
+</li>
+<li>
+<p><strong>1.9.</strong> Exporte la llave publica generado con el openssl:</p>
+<p>exportPrivateKey -k <span class="openss-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver.pem</p>
+</li>
+<li>
+<p><strong>1.10.</strong> Saiga el cliente:</p>
+<p>exit</p>
+</li>
+<li>
+<p><strong>1.11.</strong> Abra en una nueva pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/acm/home">AWS Certificate Manager</a></p>
+</li>
+<li><strong>1.12.</strong> Si ves la opción <strong>Get started</strong> haga click en el que esta debajo de <strong>Provision certificates</strong></li>
+<li><strong>1.13.</strong> Haga click en <strong>Import a certificate</strong></li>
+<li>
+<p><strong>1.14.</strong> En la ventana de terminal del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a>, ejecute el comando:</p>
+<p>cat webserver.crt</p>
+</li>
+<li>
+<p><strong>1.15.</strong> Copie la informacion y la pegue en el campo <strong>Certificate body</strong></p>
+</li>
+<li>
+<p><strong>1.16.</strong> En la ventana de terminal del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a>, ejecute el comando:</p>
+<p>cat webserver.pem</p>
+</li>
+<li>
+<p><strong>1.17.</strong> Copie la informacion y la pegue en el campo <strong>Certificate private key</strong></p>
+</li>
+<li><strong>1.18.</strong> Haga click en <strong>Import</strong></li>
+<li><strong>1.19.</strong> Revise el mensaje y haga click de nuevo en <strong>Import</strong>
+</details></li>
+</ul>
+<h3 id="2-cree-un-balanceador-usando-el-certificado-importado">2. Cree un balanceador usando el certificado importado</h3>
+<p><details open>
+<summary><strong>(detalles)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>2.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a></li>
+<li><strong>2.2.</strong> En el menu lateral haga click en <strong>Load Balancers</strong></li>
+<li><strong>2.3.</strong> Haga click en <strong>Create Load Balancer</strong></li>
+<li><strong>2.4.</strong> Haga click en <strong>Create</strong> debajo de <strong>Application Load Balancer</strong></li>
+<li><strong>2.5.</strong> En <strong>Name</strong> llene con <strong>acm-webserver</strong></li>
+<li><strong>2.6.</strong> En <strong>Listeners</strong>, cambie el protocolo de "HTTP" a <strong>HTTPS</strong></li>
+<li><strong>2.7.</strong> En <strong>VPC</strong> seleccione el que tiene nombre <strong>cloudhsm-vpc</strong></li>
+<li><strong>2.8.</strong> Seleccione las AZ <strong>us-east-1a</strong> y <strong>us-east-1b</strong> y seleccione las subnets <strong>public</strong> para cada una.</li>
+<li><strong>2.9.</strong> Haga click en <strong>Next: Configure Security Settings</strong></li>
+<li><strong>2.10.</strong> Deje seleccionado **Choose a certificate from ACM (recommended) y seleccione el certificado importado anteriormente</li>
+<li><strong>2.11.</strong> Haga click en <strong>Next: Configure Security Groups</strong></li>
+<li><strong>2.12.</strong> Seleccione <strong>Create a new security group</strong></li>
+<li><strong>2.13.</strong> En <strong>Security group name</strong> llene con <strong>acm-webserver-sg</strong></li>
+<li><strong>2.14.</strong> En "Type" seleccione <strong>HTTPS</strong></li>
+<li><strong>2.15.</strong> Haga click en <strong>Next: Configure Routing</strong></li>
+<li><strong>2.16.</strong> En <strong>Name</strong> llene con <strong>webserver1</strong></li>
+<li><strong>2.17.</strong> Haga click en <strong>Advanced health check settings</strong></li>
+<li><strong>2.18.</strong> En la opción <strong>Healthy threashold</strong> cambie el valor para 2</li>
+<li><strong>2.19.</strong> En la opción <strong>Interval</strong> cambie el valor para 10</li>
+<li><strong>2.20.</strong> Haga click en <strong>Next: Register Targets</strong></li>
+<li><strong>2.21.</strong> En la sección <strong>Instances</strong> seleccione la instancia <strong>webserver1</strong> y haga click en <strong>Add to registered</strong></li>
+<li><strong>2.22.</strong> Haga click en <strong>Next: Review</strong> y después en <strong>Create</strong></li>
+<li><strong>2.23.</strong> Haga click en <strong>Close</strong></li>
+<li>
+<p><strong>2.24.</strong> Llene abajo la información del nombre DNS el balanceador:</p>
+<p>Entre el <strong>DNS name</strong> del balanceador: <input type="text" id="lb-dns" onkeyup="copyval(this);"/><br>
+<br>
+</details></p>
+</li>
+</ul>
+<h3 id="3-agregue-http-al-security-group-el-webserver1">3. Agregue HTTP al Security Group el webserver1</h3>
+<p><details open>
+<summary><strong>(detalles)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>3.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a></li>
+<li><strong>3.2.</strong> En el menu lateral haga click en <strong>Security Groups</strong></li>
+<li><strong>3.3.</strong> Seleccione el <strong>webserver1-sg</strong> y haga click en la pestaña <strong>Inbound</strong></li>
+<li><strong>3.4.</strong> Haga click en <strong>Edit</strong> y después en <strong>Add Rule</strong></li>
+<li><strong>3.5.</strong> En la ultima linea que se creo, seleccione el tipo <strong>HTTP</strong> y en "Source" remplaze el "0.0.0.0/0" por <strong>acm-web</strong> y cuando aparecer el id, seleccione el <strong>sg-xxxxxxxxxxx</strong></li>
+<li><strong>3.6.</strong> Haga click en <strong>Save</strong></li>
+<li><strong>3.7.</strong> En el menu lateral haga click en <strong>Target Groups</strong></li>
+<li><strong>3.8.</strong> Seleccione el <strong>webserver1</strong> y haga click en la pestaña <strong>Targets</strong></li>
+<li><strong>3.9.</strong> Vea si la instancia muestra <strong>Status</strong> como <strong>healthy</strong></li>
+<li><strong>3.10.</strong> Si todavía sigue <strong>unhealthy</strong> espere alguns segundos, haga click en icono de refresh hasta que cambie de estado</li>
+<li><strong>3.11.</strong> Pruebe si el servicio funciona correctamente en:</li>
+</ul>
+<p><a href="https://&lt;span class=&quot;lb-dns&quot;&gt;&lt;ELB DNS name&gt;&lt;/span&gt;/">https://<span class="lb-dns">&lt;ELB DNS name&gt;</span></a><br></p>
+<ul>
+<li><strong>3.12.</strong> Accepte el certificado digital auto-firmado haciendo click en <strong>Advanced...</strong> y <strong>Accept the Risk and Continue</strong>
+</details></li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../javascripts/input_copy.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

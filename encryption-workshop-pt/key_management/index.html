@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Gestão de chaves - Encryption Workshop</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="..">Encryption Workshop</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="..">Início</a>
+                            </li>
+                            <li >
+                                <a href="../cluster_init/">Inicialização</a>
+                            </li>
+                            <li class="active">
+                                <a href="./">Gestão de chaves</a>
+                            </li>
+                            <li >
+                                <a href="../website/">Website</a>
+                            </li>
+                            <li >
+                                <a href="../acm/">ACM</a>
+                            </li>
+                            <li >
+                                <a href="../kms/">KMS</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../cluster_init/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../website/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#gerenciamento-de-chaves">Gerenciamento de Chaves</a></li>
+            <li><a href="#1-criando-chaves-no-hsm">1. Criando chaves no HSM</a></li>
+            <li><a href="#2-importando-una-llave-aes-256-al-cloudhsm">2. Importando una llave AES-256 al CloudHSM</a></li>
+            <li><a href="#3-exportando-la-llave-aes-256-del-cloudhsm">3. Exportando la llave AES-256 del CloudHSM</a></li>
+            <li><a href="#4-usando-openssl-con-llaves-en-el-cloudhsm">4. Usando openssl con llaves en el CloudHSM</a></li>
+            <li><a href="#5-ponga-el-certificado-y-fake_pem-en-el-bucket-s3">5. Ponga el certificado y fake_pem en el bucket S3</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="gerenciamento-de-chaves">Gerenciamento de Chaves</h2>
+<h3 id="1-criando-chaves-no-hsm">1. Criando chaves no HSM</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br />
+Neste módulo varios tipos de chaves serão criados (simétricas e assimétricas)</p>
+<p>Entre o <strong>user id</strong> ou valor aleatório usado no módulo anterior: <input type="text" id="user-id" onkeyup="copyval(this);"/><br></p>
+<ul>
+<li><strong>1.1.</strong> Volte à janela ou aba do navegador do serviço <a href="https://console.aws.amazon.com/ssm/home">AWS Systems Manager</a> em que está aberto o terminal à instancia</li>
+<li>
+<p><strong>1.2.</strong> Inicie o serviço cliente do CloudHSM usando:
+<pre>sudo systemctl start cloudhsm-client</pre></p>
+</li>
+<li>
+<p><strong>1.3.</strong> Inicie o agente de gestão de chaves com o comando
+<pre>./key_mgmt_util</pre></p>
+</li>
+<li>
+<p><strong>1.4.</strong> Faça login com o usuário crypto user criado anteriormente usando:
+<pre>loginHSM -u CU -s user1 -p defaultPassword</pre></p>
+</li>
+<li>
+<p><strong>1.5.</strong> Crie uma chave simétrica AES-256 com o comando:
+<pre>genSymKey -t 31 -s 32 -l aes256</pre></p>
+</li>
+</ul>
+<p>Tome nota do <strong>Key Handle</strong> desta chave aqui: <input type="text" id="aes-256-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+<ul>
+<li><strong>1.6.</strong> Crie uma chave assimétrica RSA com o comando:
+<pre>genRSAKeyPair -m 2048 -e 65541 -l rsa_test</pre></li>
+</ul>
+<p>Tome nota do <strong>Key Handle</strong> desta chave aqui: <input type="text" id="rsa-key-handle" onkeyup="copyval(this);"/><br>
+<br></p>
+<ul>
+<li>
+<p><strong>1.7.</strong> Crie uma chave de curva elíptica com o comando:
+<pre>genECCKeyPair -i 12 -l ecc12</pre></p>
+</li>
+<li>
+<p><strong>1.8.</strong> Crie uma wrapping key com o no CloudHSM e tome nota de seu <strong>key handle</strong>:
+<pre>genSymKey -t 31 -s 32 -l wrappingKey</pre></p>
+<p>Llene el <strong>Key Handle</strong> del wrapping key: <input type="text" id="wrapping-key-handle" onkeyup="copyval(this);"/><br>
+Tome nota también de ese numero en un editor de texto pues la va a necesitar en una etapa seguiente.
+<br></p>
+</li>
+<li>
+<p><strong>1.9.</strong> Saiga del agente con el comando:</p>
+<p>exit
+</details></p>
+</li>
+</ul>
+<h3 id="2-importando-una-llave-aes-256-al-cloudhsm">2. Importando una llave AES-256 al CloudHSM</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br />
+En este modulo se va a importar una llave simetrica AES-256 al CloudHSM</p>
+<ul>
+<li><strong>2.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/ssm/home">AWS Systems Manager</a> en la terminal de la instancia</li>
+<li>
+<p><strong>2.2.</strong> Genere una llave simetrica AES-256 para importación con la herramienta openssl</p>
+<p>openssl rand -out aes256-forImport.key 32</p>
+</li>
+<li>
+<p><strong>2.3.</strong> Use el comando imSymKey para importar al CloudHSM la llave AES-256 generada con openssl en el paso anteriormente.</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword imSymKey -f aes256-forImport.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -t 31 -l imported</p>
+</li>
+</ul>
+</details>
+
+<h3 id="3-exportando-la-llave-aes-256-del-cloudhsm">3. Exportando la llave AES-256 del CloudHSM</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>3.1.</strong> Exporte en texto plano la llave AES-256 creada anteriormente (key handle -k). El agente usa una llave AES-256 de wrapping creada anteriormente(key handle -w) en el CloudHSM. Entonces escribe la llave en texto plano al archivo AES-256-CHSM-unencrypted.key.</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword exSymKey -k <span class="aes-256-key-handle">&lt;AES-256 key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out AES-256-CHSM-unencrypted.key</p>
+</li>
+<li>
+<p><strong>3.2.</strong> Importe la llave AES-256 en texto plano creada anteriormente (key handle -k).</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword imSymKey -t 31 -f AES-256-CHSM-unencrypted.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -l imported_fromPlaintext<br></p>
+</li>
+<li>
+<p><strong>3.3.</strong> Exporte la misma llave AES-256 de manera cifrada con el comando:</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword wrapKey -k <span class="aes-256-key-handle">&lt;AES-256 key handle&gt;</span> -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out AES-256-CHSM-encrypted.key<br></p>
+</li>
+<li>
+<p><strong>3.4.</strong> Vuelva a importar esa llave cifrada al CloudHSM:</p>
+<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s user1 -p defaultPassword unWrapKey -f AES-256-CHSM-encrypted.key -w <span class="wrapping-key-handle">&lt;wrapping key handle&gt;</span><br></p>
+</li>
+<li>
+<p><strong>3.5.</strong> Saiga del agente con el comando:</p>
+<p>exit
+</details></p>
+</li>
+</ul>
+<h3 id="4-usando-openssl-con-llaves-en-el-cloudhsm">4. Usando openssl con llaves en el CloudHSM</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>4.1.</strong> Instale la libreria</p>
+<p>wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-dyn-latest.el7.x86_64.rpm<br>
+sudo yum install -y ./cloudhsm-client-dyn-latest.el7.x86_64.rpm<br></p>
+</li>
+<li>
+<p><strong>4.2.</strong> Configure las credenciales</p>
+<p>export n3fips_password=user1:defaultPassword<br></p>
+</li>
+<li>
+<p><strong>4.3.</strong> Cree un key pair</p>
+<p>openssl genrsa -engine cloudhsm -out fake_pem.key 2048<br></p>
+</li>
+<li>
+<p><strong>4.4.</strong> Cree un CSR</p>
+<p>openssl req -engine cloudhsm -new -key fake_pem.key -out webserver.csr<br></p>
+</li>
+<li>
+<p><strong>4.4.</strong> Cree un Certificado auto-firmado con el comando:</p>
+<p>openssl x509 -engine cloudhsm -req -days 365 -in webserver.csr -signkey fake_pem.key -out webserver.crt<br>
+</details></p>
+</li>
+</ul>
+<h3 id="5-ponga-el-certificado-y-fake_pem-en-el-bucket-s3">5. Ponga el certificado y fake_pem en el bucket S3</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li>
+<p><strong>5.1.</strong> Envie el archivo PEM de llave y el certificado generado al bucket S3 con los comandos</p>
+<p>aws s3 cp ./fake_pem.key s3://crypto-<span class="user-id">&lt;su user id&gt;</span>/<br>
+aws s3 cp ./webserver.crt s3://crypto-<span class="user-id">&lt;su user id&gt;</span>/<br></p>
+</li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../javascripts/input_copy.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

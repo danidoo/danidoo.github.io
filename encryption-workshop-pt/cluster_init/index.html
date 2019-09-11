@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Inicialização - Encryption Workshop</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="..">Encryption Workshop</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="..">Início</a>
+                            </li>
+                            <li class="active">
+                                <a href="./">Inicialização</a>
+                            </li>
+                            <li >
+                                <a href="../key_management/">Gestão de chaves</a>
+                            </li>
+                            <li >
+                                <a href="../website/">Website</a>
+                            </li>
+                            <li >
+                                <a href="../acm/">ACM</a>
+                            </li>
+                            <li >
+                                <a href="../kms/">KMS</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="..">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../key_management/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#inicializacao-do-cluster">Inicialização do Cluster</a></li>
+            <li><a href="#1-crie-um-ambiente-de-redes-vpc-subnets-etc">1. Crie um ambiente de redes (VPC, Subnets, etc.)</a></li>
+            <li><a href="#2-crie-um-cluster">2. Crie um cluster</a></li>
+            <li><a href="#3-crie-um-bucket-s3-para-armazenamento-de-objetos">3. Crie um bucket S3 para armazenamento de objetos</a></li>
+            <li><a href="#4-crie-um-bukcet-s3-para-armazemaneto-de-sessoes">4. Crie um bukcet S3 para armazemaneto de sessões</a></li>
+            <li><a href="#5-crie-uma-politica-de-iam-de-acesso-ao-bucket-s3-criado-anteriormente">5. Crie uma política de IAM de acesso ao bucket S3 criado anteriormente</a></li>
+            <li><a href="#6-crie-um-role-iam-para-instancias-ec2-gerenciadas-pelo-ssm-systems-manager">6. Crie um role IAM para instancias EC2 gerenciadas pelo SSM Systems Manager</a></li>
+            <li><a href="#7-crie-um-cloudhsm-no-cluster">7. Crie um CloudHSM no Cluster</a></li>
+            <li><a href="#8-crie-uma-instancia-ec2-para-gestao-do-cloudhsm">8. Crie uma instancia EC2 para gestão do CloudHSM</a></li>
+            <li><a href="#9-descargue-el-csr-y-lo-deje-disponible-para-firmar-en-el-bucket-s3">9. Descargue el CSR y lo deje disponible para firmar en el bucket S3</a></li>
+            <li><a href="#10-configure-o-session-manager">10. Configure o session manager</a></li>
+            <li><a href="#11-use-a-instancia-de-administracao-para-assinar-o-csr">11. Use a instancia de administração para assinar o CSR</a></li>
+            <li><a href="#12-use-o-cliente-do-cloudhsm-para-conectar-ao-cluster">12. Use o cliente do CloudHSM para conectar ao cluster</a></li>
+            <li><a href="#13-configure-as-regras-de-firewall-para-conectar-ao-cloudhsm">13. Configure as regras de firewall para conectar ao CloudHSM</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="inicializacao-do-cluster">Inicialização do Cluster</h2>
+<p>Neste laboratório será feita a inicialização de um cluster de CloudHSM.</p>
+<h3 id="1-crie-um-ambiente-de-redes-vpc-subnets-etc">1. Crie um ambiente de redes (VPC, Subnets, etc.)</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br />
+Se a infraestrutura básica foi criada no módulo anterior, você poderá saltar este passo.</p>
+<ul>
+<li><strong>1.1.</strong> Em um navegador, abra a URL</li>
+</ul>
+<p><a href="https://github.com/danidoo/danidoo.github.io/blob/master/cloudhsm-workshop/CFN-CloudHSMWorkshop.yml">https://github.com/danidoo/danidoo.github.io/blob/master/cloudhsm-workshop/CFN-CloudHSMWorkshop.yml</a></p>
+<ul>
+<li><strong>1.2.</strong> Clique em <strong>Raw</strong> e baixe o arquivo para seu computador com usando o nome cloudhsm-landing-zone.json.</li>
+<li><strong>1.3.</strong> Abra a console AWS no serviço<a href="https://console.aws.amazon.com/cloudformation/home">AWS CloudFormation</a>.</li>
+<li><strong>1.4.</strong> Verifique que a console está usando a região "N. Virginia" (está informação se encontra no canto superior direto da tela)</li>
+<li><strong>1.5.</strong> Clique em  <strong>Create stack</strong></li>
+<li><strong>1.6.</strong> Selecione o "Template source" para <strong>Upload a template file</strong></li>
+<li><strong>1.7.</strong> Clique em <strong>Choose a file</strong> e selecione o arquivo baixado anteriormente</li>
+<li><strong>1.8.</strong> Clique em <strong>Next</strong></li>
+<li><strong>1.9.</strong> No campo <strong>Stack name</strong> preencha com o nome <strong>CloudHSM-Stack</strong> e clique em <strong>Next</strong></li>
+<li><strong>1.10.</strong> Clique em <strong>Next</strong> e depois em <strong>Create stack</strong>
+</details></li>
+</ul>
+<h3 id="2-crie-um-cluster">2. Crie um cluster</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>2.1.</strong> Em uma nova janela ou aba do navegador abra a console da AWS no serviço <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a> na região de N. Virginia</li>
+<li><strong>2.2.</strong> Clique em <strong>Create cluster</strong>, e usando os IDs do VPC e subnets, escolha os parametros adequedos</li>
+<li><strong>2.3.</strong> Deixe a opção <strong>Create new cluster</strong> selecionada e clique em <strong>Next: Review</strong> e depois em <strong>Create cluster</strong></li>
+<li><strong>2.4.</strong> A criação do cluster pode levar até 10 minutos. Continue com a próxima etapa enquanto o processo corre.
+</details></li>
+</ul>
+<h3 id="3-crie-um-bucket-s3-para-armazenamento-de-objetos">3. Crie um bucket S3 para armazenamento de objetos</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<p>Entre seu um user id ou um valor aleatório para gerar objetos únicos <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
+<br></p>
+<ul>
+<li><strong>3.1.</strong> Em uma nova janela ou aba do navegador, abra a console da AWS no serviço <a href="https://console.aws.amazon.com/s3/home">Amazon S3</a></li>
+<li><strong>3.2.</strong> Clique em <strong>Create bucket</strong></li>
+<li><strong>3.2.</strong> Em <strong>Bucket name</strong> preencha com o nome <strong>crypto-<span class="user-id">&lt;su user id&gt;</span></strong> (os buckets precisam ter nomes únicos globalmente)</li>
+<li><strong>3.2.</strong> Escolha a região <strong>US East (N. Virginia)</strong></li>
+<li><strong>3.2.</strong> Clique em <strong>Create</strong>
+</details></li>
+</ul>
+<h3 id="4-crie-um-bukcet-s3-para-armazemaneto-de-sessoes">4. Crie um bukcet S3 para armazemaneto de sessões</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>4.2.</strong> Clique em <strong>Create bucket</strong></li>
+<li><strong>4.2.</strong> Em <strong>Bucket name</strong> preencha com o nome <strong>session-logs-<span class="user-id">&lt;su user id&gt;</span></strong> (os buckets preseisam ter nomes únicos globalmente)</li>
+<li><strong>4.2.</strong> Selecione a região <strong>US East (N. Virginia)</strong></li>
+<li><strong>4.2.</strong> Clique em <strong>Create</strong>
+</details></li>
+</ul>
+<h3 id="5-crie-uma-politica-de-iam-de-acesso-ao-bucket-s3-criado-anteriormente">5. Crie uma política de IAM de acesso ao bucket S3 criado anteriormente</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>5.1.</strong> Em uma nova janela ou aba do navegador, abra a console da AWS no serviço <a href="https://console.aws.amazon.com/iam/home">Amazon IAM</a></li>
+<li><strong>5.2.</strong> Clique em <strong>Policies</strong> no menu lateral e depois em <strong>Create policy</strong></li>
+<li><strong>5.3.</strong> Clique em <strong>Choose a service</strong>, filtre por <strong>S3</strong> clique em <strong>S3</strong></li>
+<li><strong>5.4.</strong> Selecione <strong>All S3 actions (s3:*)</strong></li>
+<li><strong>5.5.</strong> Clique em <strong>Resources</strong> e depois em <strong>Add ARN</strong> do item <strong>bucket</strong></li>
+<li><strong>5.6.</strong> Em <strong>Bucket name</strong> preencha com o nome do bucket criado anteriormente (<strong>crypto-<span class="user-id">&lt;seu user id&gt;</span></strong>) e clique em <strong>Add</strong></li>
+<li><strong>5.7.</strong> Clique em <strong>Add ARN</strong> do item <strong>object</strong></li>
+<li><strong>5.8.</strong> No <strong>Bucket name</strong> e preencha com o nome do bucket criado anteriormente (<strong>crypto-<span class="user-id">&lt;seu user id&gt;</span></strong>)</li>
+<li><strong>5.9.</strong> No <strong>Object name</strong> selecione <strong>Any</strong> de pois clique em <strong>Add</strong></li>
+<li><strong>5.10.</strong> Clique em <strong>Review policy</strong></li>
+<li><strong>5.11.</strong> Em <strong>Name</strong> preencha com <strong>S3CryptoBucket</strong> e depois em <strong>Create policy</strong>
+</details></li>
+</ul>
+<h3 id="6-crie-um-role-iam-para-instancias-ec2-gerenciadas-pelo-ssm-systems-manager">6. Crie um role IAM para instancias EC2 gerenciadas pelo SSM Systems Manager</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>6.1.</strong> Ainda na console da serviçoo <a href="https://console.aws.amazon.com/iam/home">Amazon IAM</a></li>
+<li><strong>6.2.</strong> Clique em <strong>Roles</strong> no menu lateral e depois em <strong>Create role</strong></li>
+<li><strong>6.3.</strong> Clique em <strong>EC2</strong> e depois em <strong>Next: Permissions</strong></li>
+<li><strong>6.4.</strong> Filtre as políticas por <strong>ssm</strong> e escolha a política <strong>AmazonEC2RoleforSSM</strong></li>
+<li><strong>6.5.</strong> Filtre novamente por <strong>cloudhsm</strong> e escolha a política <strong>AWSCloudHSMFullAccess</strong></li>
+<li><strong>6.6.</strong> Filtre mais uma vez por <strong>s3</strong> e escolha a política criada na etapa anterior: <strong>S3CryptoBucket</strong></li>
+<li><strong>6.7.</strong> Clique em <strong>Next: Tags</strong> e depois em <strong>Next: Review</strong></li>
+<li><strong>6.8.</strong> Em <strong>Role name</strong> preencha com o nome <strong>EC2-SSM+S3Crypto</strong> e clique em <strong>Create role</strong>
+</details></li>
+</ul>
+<h3 id="7-crie-um-cloudhsm-no-cluster">7. Crie um CloudHSM no Cluster</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>7.1.</strong> Volte à janela ou aba do serviço <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></li>
+<li>
+<p><strong>7.2.</strong> Quando o status do cluster mostrar <strong>Uninitialized</strong>, clique em <strong>Initialize</strong></p>
+<p>Entre o Id do cluster (no formato <strong>cluster-xxxxxxxxxxx</strong>) <input type="text" id="cluster-id" onkeyup="copyval(this);"/><br>
+<br></p>
+</li>
+<li>
+<p><strong>7.3.</strong> Crie um novo CloudHSM no cluster, selecionando a subnet na AZ <strong>us-east-1a</strong> e clicando em <strong>Create</strong> (Se vc receber a mensagem "CreateHsm request failed", escolha a próxima AZ na lista - b, c...)</p>
+</li>
+<li><strong>7.4.</strong> o processo de criação de um novo CloudHSM no cluster pode levar cerca de 5 minutos. Siga a próxima etapa enquando espera este process.
+</details></li>
+</ul>
+<h3 id="8-crie-uma-instancia-ec2-para-gestao-do-cloudhsm">8. Crie uma instancia EC2 para gestão do CloudHSM</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>8.1.</strong> Abra a console no <a href="https://console.aws.amazon.com/vpc/home">Amazon EC2</a>.</li>
+<li><strong>8.2.</strong> Clique em <strong>Running Instances</strong> e depois em <strong>Launch Instance</strong>.</li>
+<li><strong>8.3.</strong> Selecione a versão do Sistema Operacional <strong>Amazon Linux 2 AMI (64-bit x86)</strong> clicando em <strong>Select</strong> ao lado da versão da AMI</li>
+<li><strong>8.4.</strong> No tipo de instancia, deixe selecionada <strong>t2.micro</strong> e clique em <strong>Next: Configure Instance Details</strong></li>
+<li><strong>8.5.</strong> Em <strong>Network</strong> escolha o VPC com nome <strong>cloudhsm-vpc</strong></li>
+<li><strong>8.6.</strong> Em <strong>Subnet</strong> escolha a subnet <strong>private-subnet-us-east-1b</strong> (ou preferencialmente a que está na mesma AZ em que foi criado o CloudHSM)</li>
+<li><strong>8.7.</strong> Em <strong>IAM role</strong> escolha o role criado anteriormente com nome <strong>EC2-SSM+S3Crypto</strong> e clique em <strong>Next: Add Storage</strong></li>
+<li><strong>8.8.</strong> Clique em <strong>Next Add Tags</strong> e depois em <strong>Add Tag</strong></li>
+<li><strong>8.9.</strong> No campo <strong>Key</strong> preencha com <strong>Name</strong> e no campo <strong>Value</strong> preencha com nome <strong>cloudhsm-mgmt</strong></li>
+<li><strong>8.10.</strong> Clique em <strong>Next: Configure Security Group</strong></li>
+<li><strong>8.11.</strong> Deixe selecionado <strong>Create a new security group</strong></li>
+<li><strong>8.12.</strong> Em <strong>Security group name</strong> preencha com o nome <strong>cloudhsm-mgmt-sg</strong></li>
+<li><strong>8.13.</strong> Em <strong>Description</strong> preencha com <strong>CloudHSM Management Group</strong></li>
+<li><strong>8.14.</strong> Apague a configuração de permissão de SSH clicando no <strong>X</strong> no fim da linha de configuração</li>
+<li><strong>8.15.</strong> Clique em <strong>Review and Launch</strong> e depois em <strong>Launch</strong></li>
+<li><strong>8.16.</strong> Substitua a opção "Choose an existing key pair" por <strong>Proceed without a key pair</strong></li>
+<li><strong>8.17.</strong> Selecione <strong>I acknowledge that I will not (...)</strong> e clique em <strong>Launch Instance</strong>
+</details></li>
+</ul>
+<h3 id="9-descargue-el-csr-y-lo-deje-disponible-para-firmar-en-el-bucket-s3">9. Descargue el CSR y lo deje disponible para firmar en el bucket S3</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>9.1.</strong> Volte à janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></li>
+<li><strong>9.2.</strong> Baixe o arquivo de CSR para assinar o certificado do cluster, clicando em <strong>Cluster CSR</strong> e salve-o em seu computador</li>
+<li><strong>9.3.</strong> Volte à janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/s3/home">S3</a></li>
+<li><strong>9.4.</strong> Clique no bucket criado anteriormente <strong>crypto-<span class="user-id">&lt;su user id&gt;</span></strong></li>
+<li><strong>9.5.</strong> Clique em <strong>Upload</strong> e depois em <strong>Add files</strong></li>
+<li><strong>9.6.</strong> Escolha o arquivo com o CSR baixado anteriormente (arquivo com o nome <strong><span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>_ClusterCsr.csr</strong>)</li>
+<li><strong>9.7.</strong> Clique em <strong>Upload</strong>
+</details></li>
+</ul>
+<h3 id="10-configure-o-session-manager">10. Configure o session manager</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>10.1.</strong> Abra uma nova janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a></li>
+<li><strong>10.2.</strong> No menu lateral, clique em <strong>Session Manager</strong></li>
+<li><strong>10.3.</strong> Clique em <strong>Configure Preferences</strong> ou na aba <strong>Preferences</strong></li>
+<li><strong>10.4.</strong> Na seção <strong>Write session output to an Amazon S3 bucket</strong> selecione <strong>S3 bucket</strong> e desabilite o item <strong>Encrypt log data</strong></li>
+<li><strong>10.5.</strong> Deixe selecionado <strong>Choose a bucket name from the list</strong> e selecione o bucket criado anteriormente com nome <strong>session-logs-<span class="user-id">&lt;su user id&gt;</span></strong></li>
+<li><strong>10.6.</strong> Clique em <strong>Save</strong> e depois na aba <strong>Sessions</strong></li>
+</ul>
+<h3 id="11-use-a-instancia-de-administracao-para-assinar-o-csr">11. Use a instancia de administração para assinar o CSR</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>11.3.</strong> Clique em <strong>Start session</strong></li>
+<li><strong>11.4.</strong> Selecione a instancia com nome <strong>cloudhsm-mgmt</strong> e clique em <strong>Start session</strong></li>
+<li><strong>11.5.</strong> Uma nova aba do navegador se abrirá, clique em na parte negra da tela e execute o comando <strong>cd &lt;enter&gt;</strong></li>
+<li>
+<p><strong>11.6.</strong> Execute os comandos:
+<pre>
+sudo yum update -y
+wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-latest.el7.x86_64.rpm
+sudo yum install ./cloudhsm-client-latest.el7.x86_64.rpm -y
+sudo yum install jq -y
+aws configure
+</pre></p>
+</li>
+<li>
+<p><strong>11.7.</strong> Para as configurações de <strong>AWS Access Key ID</strong> e <strong>AWS Secret Access Key</strong> deixe em branco teclando &lt;enter&gt;</p>
+</li>
+<li><strong>11.8.</strong> Na opção <strong>Default region name</strong> preencha com <strong>us-east-1</strong></li>
+<li><strong>11.9.</strong> Não altere a configuração padrão de <strong>Default output format</strong></li>
+<li>
+<p><strong>11.10.</strong> Execute o comando:
+<pre>aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/<span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>_ClusterCsr.csr .</pre></p>
+</li>
+<li>
+<p><strong>11.11.</strong> Crie um par de chaves RSA com o comando:</p>
+</li>
+</ul>
+<pre>openssl genrsa -aes256 -out customerCA.key 2048</pre>
+
+<ul>
+<li><strong>11.12.</strong> Escolha um pass phrase para as chaves e excute o comando:</li>
+</ul>
+<pre>openssl req -new -x509 -days 3652 -key customerCA.key -out customerCA.crt</pre>
+
+<ul>
+<li><strong>11.12.</strong> Usa a pass phrase criada anteriormente e escolha as opções que preferir para os dados do certificado digital</li>
+<li>
+<p><strong>11.13.</strong> Assine o CSR com o comando:
+<pre>
+openssl x509 -req -days 3652 -in <span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>_ClusterCsr.csr \
+-CA customerCA.crt \
+-CAkey customerCA.key \
+-CAcreateserial \
+-out CustomerHsmCertificate.crt
+</pre></p>
+</li>
+<li>
+<p><strong>11.14.</strong> Use o pass phrase criado anteriormente</p>
+</li>
+<li>
+<p><strong>11.15.</strong> Inicialize o cluster com o comando:
+<pre>
+aws cloudhsmv2 initialize-cluster --cluster-id <span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span> \
+--signed-cert file://CustomerHsmCertificate.crt \
+--trust-anchor file://customerCA.crt
+</pre></p>
+</li>
+<li>
+<p><strong>11.16.</strong> Volte à janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></p>
+</li>
+<li><strong>11.17.</strong> Clique no botão para atualizar as informações e veja que o status do cluster está em <strong>Initialize in progress</strong></li>
+<li><strong>11.18.</strong> O processo de inicialização do cluster leva cerca de 5 minutos. Siga para a próxima etapa enquanto o processo segue
+</details></li>
+</ul>
+<h3 id="12-use-o-cliente-do-cloudhsm-para-conectar-ao-cluster">12. Use o cliente do CloudHSM para conectar ao cluster</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>12.1.</strong> Volte à janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> que está no terminal da instancia</li>
+<li>
+<p><strong>12.2.</strong> Configure o cliente com o comando:
+<pre>sudo cp customerCA.crt /opt/cloudhsm/etc/customerCA.crt</pre></p>
+</li>
+<li>
+<p><strong>12.3.</strong> 
+<pre>
+echo '#!/bin/sh' &gt;&gt; cloudhsm_mgmt_util.sh
+echo '/opt/cloudhsm/bin/cloudhsm_mgmt_util /opt/cloudhsm/etc/cloudhsm_mgmt_util.cfg' &gt;&gt; cloudhsm_mgmt_util.sh
+chmod +x cloudhsm_mgmt_util.sh
+ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util
+</pre></p>
+</li>
+<li>
+<p><strong>12.4.</strong> Veja o endereço IP do HSM no cluster com o comando:
+<pre>aws cloudhsmv2 describe-clusters | jq '.Clusters[].Hsms[].EniIp'</pre></p>
+</li>
+<li>
+<p><strong>12.5.</strong> Configure o agente com o endereço IP do HSM com o comando:
+<pre>sudo /opt/cloudhsm/bin/configure -a &lt;IP address&gt;</pre></p>
+</li>
+<li>
+<p><strong>12.6.</strong> Execute o agente de gerenciamento do CloudHSM com o comando:
+ <pre>./cloudhsm_mgmt_util.sh</pre></p>
+</li>
+<li>
+<p><strong>12.7.</strong> Neste momento não será possível conectar ao dispositivo pois faltam regras de firewall (Security Groups) para conectar ao CloudHSM. A configuração será feita no passo seguinte
+</details></p>
+</li>
+</ul>
+<h3 id="13-configure-as-regras-de-firewall-para-conectar-ao-cloudhsm">13. Configure as regras de firewall para conectar ao CloudHSM</h3>
+<p><details open>
+<summary><strong>(detalhes)</strong></summary>
+<br /></p>
+<ul>
+<li><strong>13.1.</strong> Volte à janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/ec2/home">AWS EC2</a></li>
+<li><strong>13.2.</strong> No menu lateral clique em <strong>Instances</strong></li>
+<li><strong>13.3.</strong> Selecione a instancia com nome <strong>cloudhsm-mgmt</strong></li>
+<li><strong>13.4.</strong> Clique em <strong>Actions</strong> e dentro de <strong>Networking</strong> clique em <strong>Change Security Groups</strong></li>
+<li><strong>13.5.</strong> Selecione um Security Group adicional com "Group Name" <strong>cloudhsm-<span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>-sg</strong> (gerado automaticamente pelo Cluster)</li>
+<li><strong>13.6.</strong> Clique em <strong>Assign Security Groups</strong></li>
+<li><strong>13.7.</strong> Volte à janela ou aba do navegador no serviço <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> que está no terminal da instancia</li>
+<li>
+<p><strong>13.8.</strong> Tente novamente conectar ao HSM com o comando:
+<pre>./cloudhsm_mgmt_util.sh</pre></p>
+</li>
+<li>
+<p><strong>13.9.</strong> Veja os usuarios padrão no sistema com o comando:
+<pre>listUsers</pre></p>
+</li>
+<li>
+<p><strong>13.10.</strong> Faça login com o usuario e senha inicial com o comando:
+<pre>loginHSM PRECO admin password</pre></p>
+</li>
+<li>
+<p><strong>13.11.</strong> Troque a senha com o comando:
+<pre>changePswd PRECO admin defaultPassword</pre></p>
+</li>
+<li>
+<p><strong>13.12.</strong> Quando receber o prompt <strong>Do you want to continue(y/n)?</strong> digita <strong>y &lt;enter&gt;</strong></p>
+</li>
+<li>
+<p><strong>13.13.</strong> Use o comando “createUser“ para criar um crypto user (CU).
+<pre>createUser CU user1 defaultPassword</pre></p>
+</li>
+<li>
+<p><strong>13.14.</strong> Veja que o CloudHSM muda o tipo de usuário do cripto officer e mostra o novo usuário <strong>user1</strong>:
+<pre>listUsers</pre></p>
+</li>
+<li>
+<p><strong>13.15.</strong> Termine a sessão com o comando:
+<pre>quit</pre></p>
+</li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../javascripts/input_copy.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
