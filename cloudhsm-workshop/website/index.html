@@ -116,46 +116,58 @@
 <li>
 <p><strong>1.6.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</p>
 </li>
+<li><strong>1.7.</strong> Entre en el agente de administración del cluster con el comando:
+<pre>
+./cloudhsm_mgmt_util.sh
+</pre></li>
+<li><strong>1.8.</strong> Login
+<pre>
+loginHSM CO admin defaultPassword
+</pre></li>
+<li><strong>1.9.</strong> Cree un nuevo usuario para el servidor web
+<pre>
+createUser CU webserver1 defaultPassword
+</pre></li>
 <li>
-<p><strong>1.7.</strong> Entre en el agente de administración del cluster con el comando:</p>
-<p>./cloudhsm_mgmt_util.sh</p>
-</li>
-<li>
-<p><strong>1.8.</strong> Login</p>
-<p>loginHSM CO admin defaultPassword</p>
-</li>
-<li>
-<p><strong>1.9.</strong> Cree un nuevo usuario para el servidor web</p>
-<p>createUser CU webserver1 defaultPassword</p>
-</li>
-<li>
-<p><strong>1.10.</strong> Tome nota del numero de usuario para compartirle la llave en un paso posterior</p>
-<p>listUsers</p>
-<p>Entre el <strong>User ID</strong> del usuario <strong>webserver1</strong>: <input type="text" id="webserver1-user-id" onkeyup="copyval(this);"/><br>
+<p><strong>1.10.</strong> Tome nota del numero de usuario para compartirle la llave en un paso posterior
+<pre>
+listUsers
+</pre>
+    Entre el <strong>User ID</strong> del usuario <strong>webserver1</strong>: <input type="text" id="webserver1-user-id" onkeyup="copyval(this);"/><br>
 <br></p>
 </li>
 <li>
-<p><strong>1.11.</strong> Haga logout del CloudHSM como usuario Crypto Officer admin:</p>
-<p>logoutHSM</p>
+<p><strong>1.11.</strong> Haga logout del CloudHSM como usuario Crypto Officer admin:
+<pre>
+logoutHSM
+</pre></p>
 </li>
+<li><strong>1.12.</strong> Haga login al CloudHSM como el usuario user1 que es administrador de la llave que sera compartida:
+<pre>
+loginHSM CU user1 defaultPassword
+</pre></li>
+<li><strong>1.13.</strong> Comparta la llave privada con el usuario webserver1 con el comando:
+<pre>
+shareKey <span class="openssl-priv-key-handle">&lt;public key handle&gt;</span> <span class="webserver1-user-id">&lt;webserver1 user id&gt;</span>  1
+</pre></li>
+<li><strong>1.14.</strong> Saiga del cliente con el comando:
+<pre>
+quit
+</quit></li>
 <li>
-<p><strong>1.12.</strong> Haga login al CloudHSM como el usuario user1 que es administrador de la llave que sera compartida:</p>
-<p>loginHSM CU user1 defaultPassword</p>
-</li>
-<li>
-<p><strong>1.13.</strong> Comparta la llave privada con el usuario webserver1 con el comando:</p>
-<p>shareKey <span class="openssl-priv-key-handle">&lt;public key handle&gt;</span> <span class="webserver1-user-id">&lt;webserver1 user id&gt;</span>  1</p>
-</li>
-<li>
-<p><strong>1.14.</strong> Ahora intentemos exportar la llave como el usuario webserver1. Para eso generaremos una llava para wrapping con el comando:</p>
-<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword genSymKey -t 31 -s 32 -l wrappingKey</p>
-<p>Entre el <strong>Key Handle</strong> de la llave generada: <input type="text" id="webserver1-wrapping-key-handle" onkeyup="copyval(this);"/><br>
+<p><strong>1.15.</strong> Ahora intentemos exportar la llave como el usuario webserver1. Para eso generaremos una llava para wrapping con el comando:
+<pre>
+/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword genSymKey -t 31 -s 32 -l wrappingKey
+</pre>
+    Entre el <strong>Key Handle</strong> de la llave generada: <input type="text" id="webserver1-wrapping-key-handle" onkeyup="copyval(this);"/><br>
 <br></p>
 </li>
 <li>
-<p><strong>1.15.</strong> Y intente exportar la llave con el comando:</p>
-<p>/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword exportPrivateKey -k <span class="openssl-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="webserver1-wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver_priv.key</p>
-<p>El CloudHSM no permitirá exportar essa llave pues el usuario webserver1 no es administrador de la llave, apenas la tiene compartida para operaciones de cifrado con ella.
+<p><strong>1.16.</strong> Y intente exportar la llave con el comando:
+<pre>
+/opt/cloudhsm/bin/key_mgmt_util singlecmd loginHSM -u CU -s webserver1 -p defaultPassword exportPrivateKey -k <span class="openssl-priv-key-handle">&lt;openssl priv key handle&gt;</span> -w <span class="webserver1-wrapping-key-handle">&lt;wrapping key handle&gt;</span> -out webserver_priv.key
+</pre>
+    El CloudHSM no permitirá exportar essa llave pues el usuario webserver1 no es administrador de la llave, apenas la tiene compartida para operaciones de cifrado con ella.
 </details></p>
 </li>
 </ul>
@@ -203,53 +215,57 @@ Entre el <strong>HSM IP Address</strong>: <input type="text" id="cloudhsm-ip" on
 <li><strong>3.1.</strong> Vuelva a pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a></li>
 <li><strong>3.2.</strong> Haga click en <strong>Start session</strong></li>
 <li><strong>3.3.</strong> Seleccione el <strong>webserver1</strong> y haga click en <strong>Start session</strong></li>
+<li><strong>3.4.</strong> Haga click en la terminal y digite:
+<pre>
+    cd &lt;enter&gt;
+</pre></li>
+<li><strong>3.5.</strong> Actualize el software del Sistema Operativo y instale las librerias de CloudHSM y nginx
+<pre>
+sudo yum update -y
+wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-latest.el7.x86_64.rpm
+wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-dyn-latest.el7.x86_64.rpm
+sudo yum install ./cloudhsm-client-latest.el7.x86_64.rpm -y
+sudo yum install -y ./cloudhsm-client-dyn-latest.el7.x86_64.rpm
+sudo amazon-linux-extras install -y nginx1.12
+</pre></li>
+<li><strong>3.6.</strong> Configure el cliente del CloudHSM con los comandos:
+<pre>
+sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/customerCA.crt /opt/cloudhsm/etc/customerCA.crt
+sudo /opt/cloudhsm/bin/configure -a <span class="cloudhsm-ip">&lt;su_user_id&gt;</span>
+sudo systemctl start cloudhsm-client
+</pre></li>
+<li><strong>3.7.</strong> Cree una carpeta y copie los archivos de certificados y llaves necesarios desde el bucket S3 con los comandos:
+<pre>
+sudo mkdir -p /etc/pki/nginx/private
+sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/fake_pem.key /etc/pki/nginx/private/server.key
+sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/webserver.crt /etc/pki/nginx/server.crt
+</pre></li>
+<li><strong>3.8.</strong> Cambie la configuración de permisos del archivo de llaves fake:
+<pre>
+sudo chown nginx /etc/pki/nginx/server.crt /etc/pki/nginx/private/server.key
+</pre></li>
+<li><strong>3.9.</strong> Cambie el archivo de configuración del nginx para usar el engine de CloudHSM
+<pre>
+sudo sed -i '5issl_engine cloudhsm;' /etc/nginx/nginx.conf
+</pre></li>
 <li>
-<p><strong>3.4.</strong> Haga click en la terminal y digite:</p>
-<p>cd &lt;enter&gt;</p>
+<p><strong>3.10.</strong> Remueva los comantarios de la sección del servicio HTTPS del nginx:
+<pre>
+sudo nano /etc/nginx/nginx.conf
+</pre>
+    Baje hasta la linea siguiente a <strong># Settings for a TLS enabled server.</strong> y usando <strong>Ctrl+d</strong> para quitar los caracteres "#" al principio de todas las lineas de esa sección de la configuración. Para grabar use <strong>Ctrl+s</strong> y para salir <strong>Ctrl+x</strong></p>
 </li>
 <li>
-<p><strong>3.5.</strong> Actualize el software del Sistema Operativo y instale las librerias de CloudHSM y nginx</p>
-<p>sudo yum update -y<br>
-wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-latest.el7.x86_64.rpm<br>
-wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-dyn-latest.el7.x86_64.rpm<br>
-sudo yum install ./cloudhsm-client-latest.el7.x86_64.rpm -y<br>
-sudo yum install -y ./cloudhsm-client-dyn-latest.el7.x86_64.rpm<br>
-sudo amazon-linux-extras install nginx1.12 -y<br></p>
+<p><strong>3.11.</strong> Cambie los archivos de configuración del nginx con los comandos:
+<pre>
+sudo sed -i '11iEnvironmentFile=/etc/sysconfig/nginx' /lib/systemd/system/nginx.service
+echo 'n3fips_password=webserver1:defaultPassword' | sudo tee -a /etc/sysconfig/nginx
+</pre></p>
 </li>
-<li>
-<p><strong>3.6.</strong> Configure el cliente del CloudHSM con los comandos:</p>
-<p>sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/customerCA.crt /opt/cloudhsm/etc/customerCA.crt<br>
-sudo /opt/cloudhsm/bin/configure -a <span class="cloudhsm-ip">&lt;su_user_id&gt;</span><br>
-sudo systemctl start cloudhsm-client<br></p>
-</li>
-<li>
-<p><strong>3.7.</strong> Cree una carpeta y copie los archivos de certificados y llaves necesarios desde el bucket S3 con los comandos:</p>
-<p>sudo mkdir -p /etc/pki/nginx/private<br>
-sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/fake_pem.key /etc/pki/nginx/private/server.key<br>
-sudo aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/webserver.crt /etc/pki/nginx/server.crt<br></p>
-</li>
-<li>
-<p><strong>3.8.</strong> Cambie la configuración de permisos del archivo de llaves fake:</p>
-<p>sudo chown nginx /etc/pki/nginx/server.crt /etc/pki/nginx/private/server.key<br></p>
-</li>
-<li>
-<p><strong>3.9.</strong> Cambie el archivo de configuración del nginx para usar el engine de CloudHSM</p>
-<p>sudo sed -i '5issl_engine cloudhsm;' /etc/nginx/nginx.conf<br></p>
-</li>
-<li>
-<p><strong>3.10.</strong> Remueva los comantarios de la sección del servicio HTTPS del nginx:</p>
-<p>sudo nano /etc/nginx/nginx.conf<br></p>
-<p>Baje hasta la linea siguiente a <strong># Settings for a TLS enabled server.</strong> y usando <strong>Ctrl+d</strong> para quitar los caracteres "#". Para grabar use <strong>Ctrl+s</strong> y para salir <strong>Ctrl+x</strong></p>
-</li>
-<li>
-<p><strong>3.11.</strong> Cambie los archivos de configuración del nginx con los comandos:</p>
-<p>sudo sed -i '11iEnvironmentFile=/etc/sysconfig/nginx' /lib/systemd/system/nginx.service<br>
-echo 'n3fips_password=webserver1:defaultPassword' | sudo tee -a /etc/sysconfig/nginx<br></p>
-</li>
-<li>
-<p><strong>3.12.</strong> Inicie el servicio nginx</p>
-<p>sudo systemctl start nginx<br></p>
-</li>
+<li><strong>3.12.</strong> Inicie el servicio nginx
+<pre>
+sudo systemctl start nginx
+</pre></li>
 <li>
 <p><strong>3.13.</strong> Pruebe si el servicio funciona correctamente en <a href="https://&lt;span class=&quot;instance-ip&quot;&gt;&lt;instance Public IP&gt;&lt;/span&gt;/">https://<span class="instance-ip">&lt;instance Public IP&gt;</span></a><br></p>
 </li>

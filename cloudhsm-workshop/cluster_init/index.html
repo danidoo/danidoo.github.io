@@ -100,7 +100,7 @@
             <li><a href="#7-cree-un-cloudhsm-en-el-cluster">7. Cree un CloudHSM en el cluster</a></li>
             <li><a href="#8-cree-una-instancia-ec2-para-gestion-del-cloudhsm">8. Cree una instancia EC2 para gestión del CloudHSM</a></li>
             <li><a href="#9-descargue-el-csr-y-lo-deje-disponible-para-firmar-en-el-bucket-s3">9. Descargue el CSR y lo deje disponible para firmar en el bucket S3</a></li>
-            <li><a href="#10-use-la-instancia-de-gestion-para-firmar-el-csr">10. Use la instancia de gestión para firmar el CSR</a></li>
+            <li><a href="#10-configure-el-session-manager-para-guardar-los-logs-de-las-sesiones">10. Configure el Session Manager para guardar los logs de las sesiónes</a></li>
             <li><a href="#11-use-la-instancia-de-gestion-para-firmar-el-csr">11. Use la instancia de gestión para firmar el CSR</a></li>
             <li><a href="#12-use-el-cliente-de-cloudhsm-para-conectar-al-cluster">12. Use el cliente de CloudHSM para conectar al cluster</a></li>
             <li><a href="#13-configure-las-reglas-de-firewall-para-conectar-al-cloudhsm">13. Configure las reglas de firewall para conectar al CloudHSM</a></li>
@@ -136,24 +136,28 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
-<li><strong>2.1.</strong> En una nueva pestaña o ventana del navegador, abra la consola de AWS en el servicio <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a> en la región de N. Virginia</li>
-<li><strong>2.2.</strong> Haga click en <strong>Create cluster</strong>, y usando los Ids del VPC y las subnets, elija los parametros adecuados</li>
-<li><strong>2.3.</strong> Deje la opción <strong>Create new cluster</strong> seleccionada y haga click en <strong>Next: Review</strong> y después en <strong>Create cluster</strong></li>
-<li><strong>2.4.</strong> La creación del cluster puede llevar hasta 10 minutos. Siga con la proxima etapa mientras el proceso sigue.
+<li><strong>2.1.</strong> En una nueva pestaña o ventana del navegador, abra la consola de AWS en el servicio <a href="https://console.aws.amazon.com/vpc/home">AWS VPC</a> en la región de N. Virginia</li>
+<li><strong>2.2.</strong> Haga click en <strong>Subnets</strong> en el menu lateral</li>
+<li><strong>2.3.</strong> En una nueva pestaña o ventana del navegador, abra la consola de AWS en el servicio <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a> en la región de N. Virginia</li>
+<li><strong>2.4.</strong> Haga click en <strong>Create cluster</strong>, en <strong>VPC</strong> elija aquella con nombre <strong>cloudhsm-vpc</strong></li>
+<li><strong>2.5.</strong> Para la selección de las <strong>AZs</strong> us-east-1a y us-east-1b verifique cuales son los IDs de las subnets com nombre <strong>Protected</strong> en la pestaña de subnets abierta anteriormente y elija las subnets con mismo id</li>
+<li><strong>2.6.</strong> Para las subnets en otras <strong>AZs</strong> elija las subnets disponibles</li>
+<li><strong>2.7.</strong> Deje la opción <strong>Create new cluster</strong> seleccionada y haga click en <strong>Next: Review</strong> y después en <strong>Create cluster</strong></li>
+<li><strong>2.8.</strong> La creación del cluster puede llevar hasta 10 minutos. Siga con la proxima etapa mientras el proceso sigue.
 </details></li>
 </ul>
 <h3 id="3-cree-un-bucket-s3-para-almacenamiento-de-objetos">3. Cree un bucket S3 para almacenamiento de objetos</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
-<p>Entre su user id o un valor aleatorio para generar objetos unicos <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
-<br></p>
 <ul>
-<li><strong>3.1.</strong> En una nueva pestaña o ventana del navegador, abra la consola de AWS en el servicio <a href="https://console.aws.amazon.com/s3/home">Amazon S3</a></li>
-<li><strong>3.2.</strong> Haga click en <strong>Create bucket</strong></li>
-<li><strong>3.2.</strong> En <strong>Bucket name</strong> llene con el nombre <strong>crypto-<span class="user-id">&lt;su user id&gt;</span></strong> (los buckets tinen que tener nombres únicos globalmente)</li>
-<li><strong>3.2.</strong> Elija la región <strong>US East (N. Virginia)</strong></li>
-<li><strong>3.2.</strong> Haga click en <strong>Create</strong>
+<li><strong>3.1.</strong> Entre su user id o un valor aleatorio para generar objetos unicos <input type="text" id="user-id" onkeyup="copyval(this);"/><br>
+<br></li>
+<li><strong>3.2.</strong> En una nueva pestaña o ventana del navegador, abra la consola de AWS en el servicio <a href="https://console.aws.amazon.com/s3/home">Amazon S3</a></li>
+<li><strong>3.3.</strong> Haga click en <strong>Create bucket</strong></li>
+<li><strong>3.4.</strong> En <strong>Bucket name</strong> llene con el nombre <strong>crypto-<span class="user-id">&lt;su user id&gt;</span></strong> (los buckets tinen que tener nombres únicos globalmente)</li>
+<li><strong>3.5.</strong> Elija la región <strong>US East (N. Virginia)</strong></li>
+<li><strong>3.6.</strong> Haga click en <strong>Create</strong>
 </details></li>
 </ul>
 <h3 id="4-cree-un-bucket-s3-para-almacenamiento-de-sessiones">4. Cree un bucket S3 para almacenamiento de sessiones</h3>
@@ -207,14 +211,15 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 <ul>
 <li><strong>7.1.</strong> Vuelva a la pestaña del servicio <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></li>
 <li>
-<p><strong>7.2.</strong> Cuando el estado del cluster figure <strong>Uninitialized</strong>, haga click en <strong>Initialize</strong></p>
-<p>Entre el Id del cluster (en el formato <strong>cluster-xxxxxxxxxxx</strong>) <input type="text" id="cluster-id" onkeyup="copyval(this);"/><br>
+<p><strong>7.2.</strong> Copia aca el Id del cluster (en el formato <strong>cluster-xxxxxxxxxxx</strong>) <input type="text" id="cluster-id" onkeyup="copyval(this);"/><br>
 <br></p>
 </li>
 <li>
-<p><strong>7.3.</strong> Cree un nuvo CloudHSM en el cluster, seleccionando la subnet en la AZ <strong>us-east-1a</strong> y haciendo click en <strong>Create</strong> (Si recibes el mensaje "CreateHsm request failed", elija la siguiente AZ - b, c...)</p>
+<p><strong>7.3.</strong> Haga click en el id del cluster creado</p>
 </li>
-<li><strong>7.4.</strong> El processo de creación de un nuevo CloudHSM en el cluster puede llevar cerca de 5 minutos. Siga a la proxima etapa mientras el proceso sigue.
+<li><strong>7.4.</strong> Haga click en <strong>Initialize</strong></li>
+<li><strong>7.5.</strong> Cree un nuevo CloudHSM en el cluster, seleccionando la subnet en la AZ <strong>us-east-1a</strong> y haciendo click en <strong>Create</strong> (Si recibes el mensaje de error vuelva a elijir la AZ siguiente - b, c...)</li>
+<li><strong>7.6.</strong> El processo de creación de un nuevo CloudHSM en el cluster puede llevar cerca de 5 minutos. Siga a la proxima etapa mientras el proceso sigue.
 </details></li>
 </ul>
 <h3 id="8-cree-una-instancia-ec2-para-gestion-del-cloudhsm">8. Cree una instancia EC2 para gestión del CloudHSM</h3>
@@ -247,6 +252,7 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 <br /></p>
 <ul>
 <li><strong>9.1.</strong> Vuelva a la pestaña o ventana del navegador en el servicio <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></li>
+<li><strong>9.2.</strong> Cuando el HSM figure con "State" <strong>Active</strong>, haga click en <strong>Initialize</strong></li>
 <li><strong>9.2.</strong> Descargue el archivo para firmar el certificado del cluster, haciendo click en <strong>Cluster CSR</strong> y grabelo en tu laptop</li>
 <li><strong>9.3.</strong> Vuelva a la pestaña o ventana del navegador en el servicio <a href="https://console.aws.amazon.com/s3/home">S3</a></li>
 <li><strong>9.4.</strong> Haga click en el bucket creado anteriormente <strong>crypto-<span class="user-id">&lt;su user id&gt;</span></strong></li>
@@ -255,14 +261,14 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 <li><strong>9.7.</strong> Haga click en <strong>Upload</strong>
 </details></li>
 </ul>
-<h3 id="10-use-la-instancia-de-gestion-para-firmar-el-csr">10. Use la instancia de gestión para firmar el CSR</h3>
+<h3 id="10-configure-el-session-manager-para-guardar-los-logs-de-las-sesiones">10. Configure el Session Manager para guardar los logs de las sesiónes</h3>
 <p><details open>
 <summary><strong>(detalles)</strong></summary>
 <br /></p>
 <ul>
 <li><strong>10.1.</strong> Abra una nueva pestaña o ventana del navegador en el servicio <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a></li>
 <li><strong>10.2.</strong> En el menu lateral, haga click <strong>Session Manager</strong></li>
-<li><strong>10.3.</strong> Haga click en <strong>Configure Preferences</strong> o en la pestaña <strong>Preferences</strong></li>
+<li><strong>10.3.</strong> Seleccione la pestaña <strong>Preferences</strong> y haga click en <strong>Edit</strong></li>
 <li><strong>10.4.</strong> En la sección <strong>Write session output to an Amazon S3 bucket</strong> seleccione <strong>S3 bucket</strong> y desabilite <strong>Encrypt log data</strong></li>
 <li><strong>10.5.</strong> Deje seleccionado <strong>Choose a bucket name from the list</strong> y seleccione el bucket creado anteriormente con nombre <strong>session-logs-<span class="user-id">&lt;su user id&gt;</span></strong></li>
 <li><strong>10.6.</strong> Haga click en <strong>Save</strong> y despues en la pestaña <strong>Sessions</strong></li>
@@ -275,56 +281,58 @@ Si la infraestructura básica fue creada en el modulo anterior, podrás saltar e
 <li><strong>11.3.</strong> Haga click en <strong>Start session</strong></li>
 <li><strong>11.4.</strong> Seleccione la instancia con nombre <strong>cloudhsm-mgmt</strong> y haga click en <strong>Start session</strong></li>
 <li><strong>11.5.</strong> Una nueva pestaña se abrirá, haga click en la ventana y ejecute <strong>cd &lt;enter&gt;</strong></li>
-<li>
-<p><strong>11.6.</strong> Ejecute los comandos:</p>
-<p>sudo yum update -y<br>
-wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-latest.el7.x86_64.rpm<br>
-sudo yum install ./cloudhsm-client-latest.el7.x86_64.rpm -y<br>
-sudo yum install jq -y<br>
-aws configure<br></p>
-</li>
-<li>
-<p><strong>11.7.</strong> No cambie las configuraciones estándar <strong>AWS Access Key ID</strong> y <strong>AWS Secret Access Key</strong></p>
-</li>
+<li><strong>11.6.</strong> Ejecute los comandos:
+<pre>
+sudo yum update -y
+wget https://s3.amazonaws.com/cloudhsmv2-software/CloudHsmClient/EL7/cloudhsm-client-latest.el7.x86_64.rpm
+sudo yum install ./cloudhsm-client-latest.el7.x86_64.rpm -y
+sudo yum install jq -y
+aws configure
+</pre></li>
+<li><strong>11.7.</strong> No cambie las configuraciones estándar <strong>AWS Access Key ID</strong> y <strong>AWS Secret Access Key</strong></li>
 <li><strong>11.8.</strong> En la opción <strong>Default region name</strong> llene con <strong>us-east-1</strong></li>
 <li><strong>11.9.</strong> No cambie las configuracion estándar <strong>Default output format</strong></li>
+<li><strong>11.10.</strong> Ejecute el comando:
+<pre>
+aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/<span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>_ClusterCsr.csr .
+</pre></li>
+<li><strong>11.11.</strong> Verifique que el archivo tenga sido copiado correctamente con el mensaje "download: s3://...", si no ajuste el comando de copia y intente nuevamente</li>
+<li><strong>11.12.</strong> Crea un par de llaves y un certificado root con los comandos:
+<pre>
+openssl genrsa -aes256 -out customerCA.key 2048
+</pre></li>
+<li><strong>11.13.</strong> Elija un pass phrase para las llaves y tome nota para usarlo después</li>
+<li><strong>11.14.</strong> Crea un certificado digital con las llaves creadas con el comando:
+<pre>
+openssl req -new -x509 -days 365 -key customerCA.key -out customerCA.crt
+</pre></li>
+<li><strong>11.14.</strong> Use el pass phrase creado anteriormente y elija las opciones que quiera para las preguntas que siguen</li>
+<li><strong>11.15.</strong> Firme el CSR con el comando:
+<pre>
+openssl x509 -req -days 365 -in <span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>_ClusterCsr.csr \
+    -CA customerCA.crt \
+    -CAkey customerCA.key \
+    -CAcreateserial \
+    -out CustomerHsmCertificate.crt
+</pre></li>
+<li><strong>11.14.</strong> Use el pass phrase creado anteriormente</li>
+<li><strong>11.15.</strong> Inicialice el cluster con el comando:
+<pre>
+aws cloudhsmv2 initialize-cluster --cluster-id <span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span> \
+    --signed-cert file://CustomerHsmCertificate.crt \
+    --trust-anchor file://customerCA.crt
+</pre></li>
 <li>
-<p><strong>11.10.</strong> Ejecute los comandos:</p>
-<p>aws s3 cp s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>/<span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>_ClusterCsr.csr .</p>
+<p><strong>11.16.</strong> Copia el certificado al bucket S3 con el comando:
+<pre>
+aws s3 cp customerCA.crt s3://crypto-<span class="user-id">&lt;su_user_id&gt;</span>
+</pre></p>
 </li>
 <li>
-<p><strong>11.11.</strong> Crea un par de llaves y un certificado root con los comandos:</p>
-<p>openssl genrsa -aes256 -out customerCA.key 2048</p>
+<p><strong>11.17.</strong> Vuelva a la pestaña o ventana del navegador en el servicio <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></p>
 </li>
-<li>
-<p><strong>11.12.</strong> Elija un pass phrase para las llaves</p>
-<p>openssl req -new -x509 -days 3652 -key customerCA.key -out customerCA.crt</p>
-</li>
-<li>
-<p><strong>11.12.</strong> Use el pass phrase creado anteriormente y elija las opciones que quiera para las preguntas que siguen</p>
-</li>
-<li>
-<p><strong>11.13.</strong> Firme el CSR con el comando:</p>
-<p>openssl x509 -req -days 3652 -in <span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>_ClusterCsr.csr \<br>
--CA customerCA.crt \<br>
--CAkey customerCA.key \<br>
--CAcreateserial \<br>
--out CustomerHsmCertificate.crt<br></p>
-</li>
-<li>
-<p><strong>11.14.</strong> Use el pass phrase creado anteriormente</p>
-</li>
-<li>
-<p><strong>11.15.</strong> Inicialice el cluster con el comando:</p>
-<p>aws cloudhsmv2 initialize-cluster --cluster-id <span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span> \<br>
---signed-cert file://CustomerHsmCertificate.crt \<br>
---trust-anchor file://customerCA.crt<br></p>
-</li>
-<li>
-<p><strong>11.16.</strong> Vuelva a la pestaña o ventana del navegador en el servicio <a href="https://console.aws.amazon.com/cloudhsm/home">AWS CloudHSM</a></p>
-</li>
-<li><strong>11.17.</strong> Haga click en el botón de refrescar y vea que el status del cluster esta en <strong>Initialize in progress</strong></li>
-<li><strong>11.10.</strong> El processo de inicialización del cluster puede llevar cerca de 5 minutos. Siga a la proxima etapa mientras el proceso sigue.
+<li><strong>11.18.</strong> Haga click en el botón de refrescar y vea que el status del cluster esta en <strong>Initialize in progress</strong></li>
+<li><strong>11.19.</strong> El processo de inicialización del cluster puede llevar cerca de 5 minutos. Siga a la proxima etapa mientras el proceso sigue.
 </details></li>
 </ul>
 <h3 id="12-use-el-cliente-de-cloudhsm-para-conectar-al-cluster">12. Use el cliente de CloudHSM para conectar al cluster</h3>
@@ -333,33 +341,31 @@ aws configure<br></p>
 <br /></p>
 <ul>
 <li><strong>12.1.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</li>
-<li>
-<p><strong>12.2.</strong> Configure el cliente con el comando:</p>
-<p>sudo cp customerCA.crt /opt/cloudhsm/etc/customerCA.crt</p>
-</li>
-<li>
-<p><strong>12.3.</strong> </p>
-<p>echo '#!/bin/sh' &gt;&gt; cloudhsm_mgmt_util.sh<br>
-echo '/opt/cloudhsm/bin/cloudhsm_mgmt_util /opt/cloudhsm/etc/cloudhsm_mgmt_util.cfg' &gt;&gt; cloudhsm_mgmt_util.sh<br>
-chmod +x cloudhsm_mgmt_util.sh<br>
-ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util<br></p>
-</li>
-<li>
-<p><strong>12.4.</strong> Vea la dirección IP del HSM en el cluster con el comando:</p>
-<p>aws cloudhsmv2 describe-clusters | jq '.Clusters[].Hsms[].EniIp'</p>
-</li>
-<li>
-<p><strong>12.5.</strong> Use la dirección IP del HSM para configurar el agente con el comando</p>
-<p>sudo /opt/cloudhsm/bin/configure -a &lt;IP address&gt;</p>
-</li>
-<li>
-<p><strong>12.6.</strong> Lanze el agente de gestión del CloudHSM con el comando:</p>
-<p>./cloudhsm_mgmt_util.sh</p>
-</li>
-<li>
-<p><strong>12.7.</strong> En ese momento no vas a poder conectar pues faltan las reglas de firewall (Security Groups) para acceder al CloudHSM. Lo haremos en el paso siguiente
-</details></p>
-</li>
+<li><strong>12.2.</strong> Configure el cliente con el comando:
+<pre>
+sudo cp customerCA.crt /opt/cloudhsm/etc/customerCA.crt
+</pre></li>
+<li><strong>12.3.</strong> Cree un script para ejecutar la herramienta de gestión con los comandos:
+<pre>
+echo '#!/bin/sh' &gt;&gt; cloudhsm_mgmt_util.sh
+echo '/opt/cloudhsm/bin/cloudhsm_mgmt_util /opt/cloudhsm/etc/cloudhsm_mgmt_util.cfg' &gt;&gt; cloudhsm_mgmt_util.sh
+chmod +x cloudhsm_mgmt_util.sh
+ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util
+</pre></li>
+<li><strong>12.4.</strong> Verifique la dirección IP del HSM en el cluster con el comando:
+<pre>
+aws cloudhsmv2 describe-clusters | jq '.Clusters[].Hsms[].EniIp'
+</pre></li>
+<li><strong>12.5.</strong> Use la dirección IP del HSM para configurar el agente con el comando:
+<pre>
+sudo /opt/cloudhsm/bin/configure -a &lt;IP address&gt;
+</pre></li>
+<li><strong>12.6.</strong> Lanze el agente de gestión del CloudHSM con el comando:
+<pre>
+./cloudhsm_mgmt_util.sh
+</pre></li>
+<li><strong>12.7.</strong> En ese momento <strong>NO VAS A PODER CONECTAR AL CloudHSM</strong> pues faltan las reglas de firewall (Security Groups) para acceder al CloudHSM. Lo haremos en el paso siguiente
+</details></li>
 </ul>
 <h3 id="13-configure-las-reglas-de-firewall-para-conectar-al-cloudhsm">13. Configure las reglas de firewall para conectar al CloudHSM</h3>
 <p><details open>
@@ -373,37 +379,46 @@ ln -s /opt/cloudhsm/bin/key_mgmt_util key_mgmt_util<br></p>
 <li><strong>13.5.</strong> Seleccione un Security Group adicional con "Group Name" <strong>cloudhsm-<span class="cluster-id">&lt;cluster-xxxxxxxxxxxx&gt;</span>-sg</strong> (generado automaticamente por el Cluster)</li>
 <li><strong>13.6.</strong> Haga click en <strong>Assign Security Groups</strong></li>
 <li><strong>13.7.</strong> Vuelva a la pestaña o ventana del navegador del <a href="https://console.aws.amazon.com/systems-manager/home">AWS Systems Manager</a> en la terminal de la instancia</li>
+<li><strong>13.8.</strong> Intente de nuevo conectar al HSM con el comando:
+<pre>
+./cloudhsm_mgmt_util.sh
+</pre></li>
+<li><strong>13.9.</strong> Vea los usuarios estándar en el sistema con el comando:
+<pre>
+listUsers
+</pre></li>
+<li><strong>13.10.</strong> Haga login con el usuario y contraseña inicial con el comando:
+<pre>
+loginHSM PRECO admin password
+</pre></li>
+<li><strong>13.11.</strong> Cambie la contraseña con el comando:
+<pre>
+changePswd PRECO admin defaultPassword
+</pre></li>
+<li><strong>13.12.</strong> Cuando recibir el prompt <strong>Do you want to continue(y/n)?</strong> digita <strong>y &lt;enter&gt;</strong></li>
 <li>
-<p><strong>13.8.</strong> Intente de nuevo conectar al HSM con el comando:</p>
-<p>./cloudhsm_mgmt_util.sh</p>
+<p><strong>13.13.</strong> Haga logout del HSM con el usuario PRECO
+<pre>logoutHSM</pre></p>
 </li>
 <li>
-<p><strong>13.9.</strong> Vea los usuarios estándar en el sistema con el comando:</p>
-<p>listUsers</p>
+<p><strong>13.14.</strong> Vuelve a hacer login con el usuario CO:
+<pre>
+loginHSM CO admin defaultPassword
+</pre></p>
 </li>
-<li>
-<p><strong>13.10.</strong> Haga login con el usuario y contraseña inicial con el comando:</p>
-<p>loginHSM PRECO admin password</p>
-</li>
-<li>
-<p><strong>13.11.</strong> Cambie la contraseña con el comando:</p>
-<p>changePswd PRECO admin defaultPassword</p>
-</li>
-<li>
-<p><strong>13.12.</strong> Cuando recibir el prompt <strong>Do you want to continue(y/n)?</strong> digita <strong>y &lt;enter&gt;</strong></p>
-</li>
-<li>
-<p><strong>13.13.</strong> Usa el comando “createUser“ para crear un crypto user (CU).</p>
-<p>createUser CU user1 defaultPassword</p>
-</li>
-<li>
-<p><strong>13.14.</strong> Vea que el CloudHSM cabia el tipo de usuario del crypto officer y muestra el nuevo usuario <strong>user1</strong>:</p>
-<p>listUsers</p>
-</li>
-<li>
-<p><strong>13.15.</strong> Termine la sesión en el agente con el comando:</p>
-<p>quit</p>
-</li>
+<li><strong>13.15.</strong> Usa el comando “createUser“ para crear un crypto user (CU).
+<pre>
+createUser CU user1 defaultPassword
+</pre></li>
+<li><strong>13.16.</strong> Cuando recibir el prompt <strong>Do you want to continue(y/n)?</strong> digita <strong>y &lt;enter&gt;</strong></li>
+<li><strong>13.17.</strong> Vea que el CloudHSM cabia el tipo de usuario del crypto officer y muestra el nuevo usuario <strong>user1</strong>:
+<pre>
+listUsers
+</pre></li>
+<li><strong>13.18.</strong> Termine la sesión en el agente con el comando:
+<pre>
+quit
+</pre></li>
 </ul></div>
         </div>
 
